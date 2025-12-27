@@ -10,7 +10,7 @@ class SshTest extends Controller
     {
         $host = '5.161.144.182';
         $user = 'root';
-        $key = '/root/.ssh/private_hetzner2.key';
+        $key = '/var/www/.ssh/private_hetzner2.key';
         $command = '/root/scripts/test.sh';
 
         $conn = ssh2_connect($host, 22);
