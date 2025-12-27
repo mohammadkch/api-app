@@ -7,6 +7,8 @@ use CodeIgniter\Router\RouteCollection;
  */
 //$routes->get('/', 'Home::index');
 
+$routes->get('/sshtest', 'SshTest::index');
+
 // ---------------------------------------------
 // تست اتصال SQLite
 // ---------------------------------------------
