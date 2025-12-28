@@ -74,13 +74,14 @@ class SshTest extends Controller
             die('auth failed');
         }
 
-//        $stream = ssh2_exec($conn, 'bash /root/scripts/test.sh');
-//        stream_set_blocking($stream, true);
-//        echo stream_get_contents($stream);
-
         $client = 'ali';
-        $cmd = escapeshellcmd("/root/scripts/ovpn-add.sh $client");
-        $output = shell_exec($cmd);
+        $command = "bash /root/scripts/ovpn-add.sh $client";
+
+        $stream = ssh2_exec($conn, $command);
+        stream_set_blocking($stream, true);
+        $output = stream_get_contents($stream);
+        fclose($stream);
+
         echo $output;
     }
 }
