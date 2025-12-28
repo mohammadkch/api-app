@@ -50,6 +50,37 @@ class SshTest extends Controller
         stream_set_blocking($stream, true);
         echo stream_get_contents($stream);
 
+        $client = 'ali';
+        $cmd = escapeshellcmd("/root/scripts/ovpn-add.sh $client");
+        $output = shell_exec($cmd);
+        echo $output;
 
+
+    }
+
+    public function addOpen()
+    {
+        $host = '5.161.144.182';
+        $user = 'root';
+        $priv = '/var/www/.ssh/cross-servers.key';
+        $pub  = '/var/www/.ssh/cross-servers.key.pub';
+
+        $conn = ssh2_connect($host, 22);
+        if (!$conn) {
+            die('connect failed');
+        }
+
+        if (!ssh2_auth_pubkey_file($conn, $user, $pub, $priv)) {
+            die('auth failed');
+        }
+
+//        $stream = ssh2_exec($conn, 'bash /root/scripts/test.sh');
+//        stream_set_blocking($stream, true);
+//        echo stream_get_contents($stream);
+
+        $client = 'ali';
+        $cmd = escapeshellcmd("/root/scripts/ovpn-add.sh $client");
+        $output = shell_exec($cmd);
+        echo $output;
     }
 }
