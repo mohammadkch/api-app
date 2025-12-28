@@ -58,7 +58,7 @@ class SshTest extends Controller
 
     }
 
-    public function addOpen()
+    public function addOpenVpn()
     {
         $host = '5.161.144.182';
         $user = 'root';
@@ -75,7 +75,7 @@ class SshTest extends Controller
         }
 
         $client = 'ali';
-        $command = "bash /root/scripts/ovpn-add.sh $client";
+        $command = "bash /root/scripts/add-openvpn.sh $client";
 
         $stream = ssh2_exec($conn, $command);
         stream_set_blocking($stream, true);
