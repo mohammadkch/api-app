@@ -48,7 +48,7 @@ class SshTest extends Controller
             die('auth failed');
         }
 
-        $client = 'ali';
+        $client = 'ali-n';
         $command = "bash /root/scripts/add-openvpn.sh $client";
 
         $stream = ssh2_exec($conn, $command);
@@ -63,15 +63,13 @@ class SshTest extends Controller
     {
         $host = '5.161.144.182';
         $user = 'root';
-        $priv = '/var/www/.ssh/cross-servers.key';
-        $pub  = '/var/www/.ssh/cross-servers.key.pub';
 
         $conn = ssh2_connect($host, 22);
         if (!$conn) {
             die('connect failed');
         }
 
-        if (!ssh2_auth_pubkey_file($conn, $user, $pub, $priv)) {
+        if (!ssh2_auth_pubkey_file($conn, $user, $this->public_key, $this->private_key)) {
             die('auth failed');
         }
 
