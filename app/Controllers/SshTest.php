@@ -81,11 +81,21 @@ class SshTest extends Controller
         $delete_command = "sudo /opt/scripts/revoke_client.sh " . escapeshellarg($client);
 
         $stream = ssh2_exec($conn, $delete_command);
-        stream_set_blocking($stream, true);
-        $output = stream_get_contents($stream);
-        fclose($stream);
 
-        echo $output;
-        return $output;
+        $errStream = ssh2_fetch_stream($stream, SSH2_STREAM_STDERR);
+
+        stream_set_blocking($stream, true);
+        stream_set_blocking($errStream, true);
+
+        $output = stream_get_contents($stream);
+        $error  = stream_get_contents($errStream);
+
+        fclose($stream);
+        fclose($errStream);
+
+        echo "<pre>";
+        echo "OUTPUT:\n$output\n";
+        echo "ERROR:\n$error\n";
+        echo "</pre>";
     }
 }
