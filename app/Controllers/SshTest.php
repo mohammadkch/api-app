@@ -78,7 +78,7 @@ class SshTest extends Controller
 
         $client = 'ali';
         $command = "bash /root/scripts/add-openvpn.sh $client";
-        $delete_command = "bash /root/scripts/add-openvpn.sh " . escapeshellarg($client);
+        $delete_command = "bash /root/scripts/delete-openvpn.sh " . escapeshellarg($client);
 
         $stream = ssh2_exec($conn, $delete_command);
 
