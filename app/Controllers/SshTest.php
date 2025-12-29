@@ -81,21 +81,10 @@ class SshTest extends Controller
         $delete_command = "bash /root/scripts/delete-openvpn.sh " . escapeshellarg($client);
 
         $stream = ssh2_exec($conn, $delete_command);
-
-        $errStream = ssh2_fetch_stream($stream, SSH2_STREAM_STDERR);
-
         stream_set_blocking($stream, true);
-        stream_set_blocking($errStream, true);
-
         $output = stream_get_contents($stream);
-        $error  = stream_get_contents($errStream);
-
         fclose($stream);
-        fclose($errStream);
 
-        echo "<pre>";
-        echo "OUTPUT:\n$output\n";
-        echo "ERROR:\n$error\n";
-        echo "</pre>";
+        echo "<pre>$output</pre>";
     }
 }
