@@ -73,7 +73,7 @@ class SshTest extends Controller
             die('auth failed');
         }
 
-        $client = 'ali';
+        $client = 'ali-n';
         $command = "bash /root/scripts/add-openvpn.sh $client";
         $delete_command = "bash /root/scripts/delete-openvpn.sh " . escapeshellarg($client);
 
