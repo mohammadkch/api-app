@@ -58,14 +58,14 @@ class OpenVpnService
             ];
         }
 
-        // پاک کردن فایل ovpn از استورج اپ
-        $localFile = "{$this->localOvpnDir}{$clientName}.ovpn";
+        $localFile = $this->localOvpnDir . $clientName . '.ovpn';
+        $resultArray['local_deleted'] = false;
+
         if (file_exists($localFile)) {
             unlink($localFile);
             $resultArray['local_deleted'] = true;
-        } else {
-            $resultArray['local_deleted'] = false;
         }
+
 
         return $resultArray;
     }
