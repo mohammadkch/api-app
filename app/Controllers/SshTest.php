@@ -34,7 +34,7 @@ class SshTest extends Controller
 
     }
 
-    public function addOpenVpn() : string
+    public function addOpenVpn() : void
     {
         $host = '5.161.144.182';
         $user = 'root';
@@ -57,7 +57,6 @@ class SshTest extends Controller
         fclose($stream);
 
         echo $output;
-        return $output;
     }
 
     public function deleteOpenVpn() : void
