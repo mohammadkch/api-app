@@ -60,7 +60,7 @@ class SshTest extends Controller
         return $output;
     }
 
-    public function deleteOpenVpn() : string
+    public function deleteOpenVpn() : void
     {
         $host = '5.161.144.182';
         $user = 'root';
