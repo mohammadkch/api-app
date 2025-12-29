@@ -11,8 +11,19 @@ $routes->get('/sshtest', 'SshTest::index');
 $routes->get('/add-openvpn', 'SshTest::addOpenVpn');
 $routes->get('/delete-openvpn', 'SshTest::deleteOpenVpn');
 
+// --------------------
+// API routes
+// --------------------
+$routes->group('api', function ($routes) {
+    $routes->group('openvpn', function ($routes) {
+        $routes->post('add', 'Api\OpenVpnController::add');
+        $routes->post('delete', 'Api\OpenVpnController::delete');
+    });
+});
+
+
 // ---------------------------------------------
-// تست اتصال SQLite
+// SQLite connection test
 // ---------------------------------------------
 $routes->get('/dbtest', function () {
     $db = \Config\Database::connect();
