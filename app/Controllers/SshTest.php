@@ -48,7 +48,7 @@ class SshTest extends Controller
             die('auth failed');
         }
 
-        $client = 'ali-n';
+        $client = 'ali-n2';
         $command = "bash /root/scripts/add-openvpn.sh $client";
 
         $stream = ssh2_exec($conn, $command);
