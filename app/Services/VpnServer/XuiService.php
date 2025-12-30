@@ -18,12 +18,14 @@ class XuiService
     /**
      * Add x-ui user
      */
-    public function addUser(): array
+    public function addUser(string $clientName = null): array
     {
-        $output = $this->ssh->runCommand(
-            $this->host,
-            'bash /root/scripts/add-xui.sh'
-        );
+        $cmd = 'bash /root/scripts/add-xui.sh';
+        if ($clientName) {
+            $cmd .= ' ' . escapeshellarg($clientName);
+        }
+
+        $output = $this->ssh->runCommand($this->host, $cmd);
 
         if (preg_match('/__RESULT__=(\{.*\})/', $output, $m)) {
             return json_decode($m[1], true);
@@ -35,4 +37,5 @@ class XuiService
             'raw'    => $output,
         ];
     }
+
 }

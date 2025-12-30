@@ -20,8 +20,9 @@ class XuiController extends BaseController
      */
     public function add()
     {
-        $result = $this->xui->addUser();
+        $client = $this->request->getPost('client'); // client name
 
+        $result = $this->xui->addUser($client);
         return $this->response->setJSON($result);
     }
 }
