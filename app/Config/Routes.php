@@ -19,6 +19,10 @@ $routes->group('api', function ($routes) {
         $routes->post('add', 'Api\OpenVpnController::add');
         $routes->post('delete', 'Api\OpenVpnController::delete');
     });
+
+    $routes->group('xui', function ($routes) {
+        $routes->post('add', 'Api\XuiController::add');
+    });
 });
 
 

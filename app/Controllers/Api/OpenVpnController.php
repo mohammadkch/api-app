@@ -55,14 +55,6 @@ class OpenVpnController extends BaseController
 
         $result = $this->vpn->deleteClient($client);
 
-//        $localFile = WRITEPATH . "storage/openvpn/{$client}.ovpn";
-//        if (file_exists($localFile)) {
-//            unlink($localFile);
-//            $result['local_deleted'] = true;
-//        } else {
-//            $result['local_deleted'] = false;
-//        }
-
         return $this->response->setJSON($result);
     }
 
