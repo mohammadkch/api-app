@@ -29,7 +29,7 @@ class XuiService
         }
     }
 
-    public function addUser(string $clientName = null, int $initTraffic): array
+    public function addUser(string $clientName = null, int $initTraffic = 0): array
     {
         $cmd = 'bash /root/scripts/add-xui.sh';
         if ($clientName) {

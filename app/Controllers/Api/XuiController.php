@@ -26,7 +26,7 @@ class XuiController extends BaseController
             ])->setStatusCode(400);
         }
 
-        $result = $this->xui->addUser($client, $traffic = 0);
+        $result = $this->xui->addUser($client, $traffic);
 
         return $this->response->setJSON($result);
     }
