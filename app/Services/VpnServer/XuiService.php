@@ -172,7 +172,7 @@ class XuiService
         $qrFile = $qrDir . $client . '.png';
 
         try {
-            $builder = Builder::builder()
+            $result = Builder::create()
                 ->writer(new PngWriter())
                 ->data($config)
                 ->encoding(new Encoding('UTF-8'))
@@ -181,7 +181,7 @@ class XuiService
                 ->margin(10)
                 ->build();
 
-            $builder->saveToFile($qrFile);
+            $result->saveToFile($qrFile);
 
             $qrResult['qr_status'] = 'ok';
             $qrResult['qr_path']   = $qrFile;

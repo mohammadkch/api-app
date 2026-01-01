@@ -101,7 +101,6 @@ class XuiController extends BaseController
 
         $result = $this->xui->generateQrCode($client, $link);
 
-        // Merge QR result with basic client info
         return $this->response->setJSON(array_merge($info, $result));
     }
 }
