@@ -172,7 +172,8 @@ class XuiService
         $qrFile = $qrDir . $client . '.png';
 
         try {
-            $result = Builder::create()
+            // Use builder() instead of create()
+            $result = Builder::builder()
                 ->writer(new PngWriter())
                 ->data($config)
                 ->encoding(new Encoding('UTF-8'))
