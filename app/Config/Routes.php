@@ -33,14 +33,15 @@ $routes->group('api', function ($routes) {
 // SQLite connection test
 // ---------------------------------------------
 $routes->get('/dbtest', function () {
-//    $db = \Config\Database::connect();
-//    return $db->getPlatform(); // باید SQLite3 برگرده
     $db = \Config\Database::connect();
-    try {
-        $db->query("CREATE TABLE IF NOT EXISTS test_write (id INTEGER PRIMARY KEY)");
-        $db->query("INSERT INTO test_write DEFAULT VALUES");
-        return "Write Successful! Platform: " . $db->getPlatform();
-    } catch (\Exception $e) {
-        return "Read ok, but Write failed: " . $e->getMessage();
-    }
+    return $db->getPlatform();
+
+//    $db = \Config\Database::connect();
+//    try {
+//        $db->query("CREATE TABLE IF NOT EXISTS test_write (id INTEGER PRIMARY KEY)");
+//        $db->query("INSERT INTO test_write DEFAULT VALUES");
+//        return "Write Successful! Platform: " . $db->getPlatform();
+//    } catch (\Exception $e) {
+//        return "Read ok, but Write failed: " . $e->getMessage();
+//    }
 });
