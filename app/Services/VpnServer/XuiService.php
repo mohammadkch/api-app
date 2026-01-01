@@ -18,9 +18,13 @@ class XuiService
     private function parseResult(string $output): array
     {
         if (preg_match('/__RESULT__=(\{.*\})/s', $output, $m)) {
-            return json_decode($m[1], true);
+            $result = json_decode($m[1], true);
+            if (is_array($result)) {
+                return $result;
+            }
         }
 
+        // fallback امن
         return [
             'status' => 'error',
             'error'  => 'INVALID_SCRIPT_OUTPUT',
