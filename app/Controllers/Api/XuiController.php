@@ -38,6 +38,9 @@ class XuiController extends BaseController
         $mode   = $this->request->getPost('mode');
         $value  = $this->request->getPost('value');
 
+        $post = $this->request->getPost();
+        return $this->response->setJSON($post);
+
         return $this->response->setJSON(
             $this->xui->updateUser($client, $mode, $value)
         );

@@ -8,8 +8,8 @@ use CodeIgniter\Router\RouteCollection;
 //$routes->get('/', 'Home::index');
 
 $routes->get('/sshtest', 'SshTest::index');
-$routes->get('/add-openvpn', 'SshTest::addOpenVpn');
-$routes->get('/delete-openvpn', 'SshTest::deleteOpenVpn');
+//$routes->get('/add-openvpn', 'SshTest::addOpenVpn');
+//$routes->get('/delete-openvpn', 'SshTest::deleteOpenVpn');
 
 // --------------------
 // API routes
