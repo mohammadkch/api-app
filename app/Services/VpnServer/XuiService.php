@@ -189,26 +189,14 @@ class XuiService
                 labelText: $client,
                 labelFont: new OpenSans(20),
                 labelAlignment: LabelAlignment::Center,
-                logoPath: $qrFile,
-                logoResizeToWidth: 50,
+                logoPath: null,
+                logoResizeToWidth: null,
                 logoPunchoutBackground: true
             );
 
 
             $result = $builder->build();
             $result->saveToFile($qrFile);
-
-//            $qrCode = new QrCode($config);
-//            $qrCode = $qrCode
-//                ->withEncoding(new Encoding('UTF-8'))
-//                ->withSize(300)
-//                ->withMargin(10)
-//                ->withErrorCorrectionLevel(ErrorCorrectionLevel::High);
-//
-//            $writer = new PngWriter();
-//            $result = $writer->write($qrCode);
-//
-//            $result->saveToFile($qrFile);
 
             $qrResult['qr_status'] = 'ok';
             $qrResult['qr_path']   = $qrFile;
