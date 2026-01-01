@@ -3,10 +3,13 @@
 namespace App\Services\VpnServer;
 
 use App\Libraries\SshClient;
-use Endroid\QrCode\QrCode;
-use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\Label\LabelAlignment;
+use Endroid\QrCode\Label\Font\OpenSans;
+use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\Writer\PngWriter;
 use RuntimeException;
 
 class XuiService
@@ -172,17 +175,40 @@ class XuiService
         $qrFile = $qrDir . $client . '.png';
 
         try {
-            $qrCode = new QrCode($config);
-            $qrCode = $qrCode
-                ->withEncoding(new Encoding('UTF-8'))
-                ->withSize(300)
-                ->withMargin(10)
-                ->withErrorCorrectionLevel(ErrorCorrectionLevel::High);
 
-            $writer = new PngWriter();
-            $result = $writer->write($qrCode);
+            $builder = new Builder(
+                writer: new PngWriter(),
+                writerOptions: [],
+                validateResult: false,
+                data: $config,
+                encoding: new Encoding('UTF-8'),
+                errorCorrectionLevel: ErrorCorrectionLevel::High,
+                size: 300,
+                margin: 10,
+                roundBlockSizeMode: RoundBlockSizeMode::Margin,
+                labelText: $client,
+                labelFont: new OpenSans(20),
+                labelAlignment: LabelAlignment::Center,
+                logoPath: $qrFile,
+                logoResizeToWidth: 50,
+                logoPunchoutBackground: true
+            );
 
+
+            $result = $builder->build();
             $result->saveToFile($qrFile);
+
+//            $qrCode = new QrCode($config);
+//            $qrCode = $qrCode
+//                ->withEncoding(new Encoding('UTF-8'))
+//                ->withSize(300)
+//                ->withMargin(10)
+//                ->withErrorCorrectionLevel(ErrorCorrectionLevel::High);
+//
+//            $writer = new PngWriter();
+//            $result = $writer->write($qrCode);
+//
+//            $result->saveToFile($qrFile);
 
             $qrResult['qr_status'] = 'ok';
             $qrResult['qr_path']   = $qrFile;
