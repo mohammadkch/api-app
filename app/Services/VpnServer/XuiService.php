@@ -40,8 +40,8 @@ class XuiService
         } else {
             return [
                 'status' => 'error',
-                'error' => 'INVALID_SCRIPT_OUTPUT',
-                'raw'   => $output,
+                'error'   => 'INVALID_SCRIPT_OUTPUT',
+                'raw'     => $output,
             ];
         }
 
@@ -50,12 +50,12 @@ class XuiService
             if ($link) {
                 try {
                     $qrResult = $this->generateQrCode($clientName, $link);
-                    if (($qrResult['status'] ?? '') === 'ok') {
+                    if (($qrResult['qr_status'] ?? '') === 'ok') {
                         $result['qr_status'] = 'ok';
-                        $result['qr_path']   = $qrResult['path'];
+                        $result['qr_path']   = $qrResult['qr_path'];
                     } else {
                         $result['qr_status'] = 'failed';
-                        $result['qr_error']  = $qrResult['message'] ?? $qrResult['error'] ?? 'UNKNOWN_ERROR';
+                        $result['qr_error']  = $qrResult['qr_error'] ?? 'UNKNOWN_ERROR';
                     }
                 } catch (\Throwable $e) {
                     $result['qr_status'] = 'failed';
@@ -82,15 +82,15 @@ class XuiService
         if (preg_match('/__RESULT__=(\{.*\})/', $output, $m)) {
             return json_decode($m[1], true) ?? [
                 'status' => 'error',
-                'error' => 'INVALID_OUTPUT',
-                'raw'   => $output
+                'error'  => 'INVALID_OUTPUT',
+                'raw'    => $output
             ];
         }
 
         return [
             'status' => 'error',
-            'error' => 'NO_RESULT',
-            'raw'   => $output
+            'error'  => 'NO_RESULT',
+            'raw'    => $output
         ];
     }
 
@@ -126,8 +126,8 @@ class XuiService
 
         return [
             'status' => 'error',
-            'error' => 'INVALID_SCRIPT_OUTPUT',
-            'raw'   => $output,
+            'error'  => 'INVALID_SCRIPT_OUTPUT',
+            'raw'    => $output,
         ];
     }
 
@@ -156,36 +156,41 @@ class XuiService
         ];
     }
 
-
-    public function generateQrCode(string $client, string $link): array
+    public function generateQrCode(string $client, string $config): array
     {
+        $qrResult = [
+            'qr_status' => 'failed',
+            'qr_error'  => null,
+            'qr_path'   => null,
+        ];
+
+        $qrDir = $this->storageDir;
+        if (!is_dir($qrDir)) {
+            mkdir($qrDir, 0755, true);
+        }
+
+        $qrFile = $qrDir . $client . '.png';
+
         try {
-            $result = Builder::create()
+            $builder = new Builder();
+            $builder
                 ->writer(new PngWriter())
-                ->data($link)
+                ->data($config)
                 ->encoding(new Encoding('UTF-8'))
                 ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
                 ->size(300)
-                ->margin(10)
-                ->build();
+                ->margin(10);
 
-            $filePath = $this->storageDir . $client . '.png';
-            $result->saveToFile($filePath);
+            $qr = $builder->build();
+            $qr->saveToFile($qrFile);
 
-            return [
-                'status' => 'ok',
-                'client' => $client,
-                'path'   => $filePath,
-                'qr_status' => 'ok'
-            ];
+            $qrResult['qr_status'] = 'ok';
+            $qrResult['qr_path']   = $qrFile;
+
         } catch (\Throwable $e) {
-            return [
-                'status' => 'ok', // config موجوده
-                'client' => $client,
-                'qr_status' => 'failed',
-                'qr_error' => $e->getMessage()
-            ];
+            $qrResult['qr_error'] = $e->getMessage();
         }
-    }
 
+        return $qrResult;
+    }
 }
