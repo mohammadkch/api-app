@@ -22,6 +22,9 @@ $routes->group('api', function ($routes) {
 
     $routes->group('xui', function ($routes) {
         $routes->post('add', 'Api\XuiController::add');
+        $routes->post('update', 'Api\XuiController::update');
+        $routes->post('delete', 'Api\XuiController::delete');
+        $routes->get('list', 'Api\XuiController::list');
     });
 });
 
