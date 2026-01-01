@@ -3,6 +3,7 @@
 namespace App\Services\VpnServer;
 
 use App\Libraries\SshClient;
+use App\Models\AccountModel;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
@@ -68,6 +69,28 @@ class XuiService
             } else {
                 $result['qr_status'] = 'skipped';
                 $result['qr_error']  = 'NO_CONFIG_LINK';
+            }
+        }
+
+        if (($result['status'] ?? '') === 'ok') {
+            $accountModel = new AccountModel();
+
+            $data = [
+                'server_id' => 1,
+                'client_name' => $result['client'],
+                'protocol' => 'vless',
+                'uuid' => $result['uuid'] ?? null,
+                'traffic_limit_gb' => $initTraffic,
+                'traffic_total_bytes' => ($initTraffic * 1024 * 1024 * 1024),
+                'config_link' => $result['config'] ?? null,
+                'status' => 1
+            ];
+
+            $existing = $accountModel->where('client_name', $result['client'])->first();
+            if ($existing) {
+                $accountModel->update($existing['id'], $data);
+            } else {
+                $accountModel->insert($data);
             }
         }
 
