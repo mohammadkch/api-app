@@ -189,9 +189,9 @@ class XuiService
                 labelText: $client,
                 labelFont: new OpenSans(20),
                 labelAlignment: LabelAlignment::Center,
-                logoPath: null,
-                logoResizeToWidth: null,
-                logoPunchoutBackground: true
+//                logoPath: null,
+//                logoResizeToWidth: null,
+//                logoPunchoutBackground: true
             );
 
 
