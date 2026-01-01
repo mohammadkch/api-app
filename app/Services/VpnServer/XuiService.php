@@ -172,8 +172,8 @@ class XuiService
         $qrFile = $qrDir . $client . '.png';
 
         try {
-            // Use builder() instead of create()
-            $result = Builder::builder()
+            $builder = new Builder(); // <- مهم: با new بساز
+            $qr = $builder
                 ->writer(new PngWriter())
                 ->data($config)
                 ->encoding(new Encoding('UTF-8'))
@@ -182,7 +182,7 @@ class XuiService
                 ->margin(10)
                 ->build();
 
-            $result->saveToFile($qrFile);
+            $qr->saveToFile($qrFile);
 
             $qrResult['qr_status'] = 'ok';
             $qrResult['qr_path']   = $qrFile;
@@ -193,4 +193,5 @@ class XuiService
 
         return $qrResult;
     }
+
 }
