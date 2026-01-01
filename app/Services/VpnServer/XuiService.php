@@ -6,8 +6,6 @@ use App\Libraries\SshClient;
 
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
-use Endroid\QrCode\Encoding\Encoding;
-use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
 
 class XuiService
 {
@@ -113,19 +111,35 @@ class XuiService
         ];
     }
 
-    public function generateQr(string $config, string $clientName): string
+    public function generateQrCode(string $client, string $link): array
     {
-        $qr = QrCode::create($config)
-            ->setEncoding(new Encoding('UTF-8'))
-            ->setErrorCorrectionLevel(new ErrorCorrectionLevelHigh());
+        $dir = WRITEPATH . 'storage/xui/';
+        $file = $dir . $client . '.png';
 
-        $writer = new PngWriter();
-        $qrFile = $this->qrPath . $clientName . '.png';
-        $result = $writer->write($qr);
+        try {
+            if (!is_dir($dir)) {
+                mkdir($dir, 0770, true);
+                chown($dir, 'www-data');
+                chgrp($dir, 'www-data');
+            }
 
-        $result->saveToFile($qrFile);
+            $qrCode = new QrCode($link);
+            $writer = new PngWriter();
+            $result = $writer->write($qrCode);
+            $result->saveToFile($file);
 
-        return $qrFile;
+            return [
+                'status' => 'ok',
+                'client' => $client,
+                'path' => $file
+            ];
+        } catch (\Throwable $e) {
+            return [
+                'status' => 'error',
+                'error' => 'QR_GENERATION_FAILED',
+                'message' => $e->getMessage()
+            ];
+        }
     }
 
     public function getClientInfo(string $clientName): array
