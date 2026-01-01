@@ -12,11 +12,14 @@ class OpenVpnService
     private string $remoteOvpnDir = '/root';
     private string $localOvpnDir;
 
+    private string $tunnleHost;
+
     public function __construct(string $host = '5.161.144.182')
     {
         $this->ssh = new SshClient();
         $this->host = $host;
         $this->localOvpnDir = WRITEPATH . 'storage/openvpn/';
+        $this->tunnleHost = 'ov.kouchnet.site';
 
         if (!is_dir($this->localOvpnDir)) {
             mkdir($this->localOvpnDir, 0755, true);
@@ -81,6 +84,7 @@ class OpenVpnService
 
         try {
             $this->ssh->downloadFile($this->host, $remoteFile, $localFile);
+            $this->rewriteRemote($localFile, $this->tunnleHost);
         } catch (\RuntimeException $e) {
             return [
                 'status' => 'error',
@@ -96,4 +100,23 @@ class OpenVpnService
             'path' => $localFile,
         ];
     }
+
+    private function rewriteRemote(string $filePath, string $newHost): void
+    {
+        if (!file_exists($filePath)) {
+            throw new RuntimeException("OVPN file not found: $filePath");
+        }
+
+        $lines = file($filePath, FILE_IGNORE_NEW_LINES);
+        foreach ($lines as &$line) {
+            if (preg_match('/^remote\s+[\S]+\s+(\d+)$/', $line, $m)) {
+                $port = $m[1];
+                $line = "remote $newHost $port";
+                break;
+            }
+        }
+
+        file_put_contents($filePath, implode("\n", $lines));
+    }
+
 }
