@@ -4,8 +4,6 @@ namespace App\Services\VpnServer;
 
 use App\Libraries\SshClient;
 use Endroid\QrCode\Builder\Builder;
-use Endroid\QrCode\Encoding\Encoding;
-use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
 use Endroid\QrCode\Writer\PngWriter;
 use RuntimeException;
 
@@ -172,16 +170,13 @@ class XuiService
         $qrFile = $qrDir . $client . '.png';
 
         try {
-            $builder = new Builder();
-            $builder
+            $qr = Builder::create()
                 ->writer(new PngWriter())
                 ->data($config)
-                ->encoding(new Encoding('UTF-8'))
-                ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
                 ->size(300)
-                ->margin(10);
+                ->margin(10)
+                ->build();
 
-            $qr = $builder->build();
             $qr->saveToFile($qrFile);
 
             $qrResult['qr_status'] = 'ok';
