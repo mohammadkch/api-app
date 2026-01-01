@@ -18,14 +18,30 @@ class XuiController extends BaseController
     {
         $client = $this->request->getPost('client');
 
-        if (!$client) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'error'  => 'CLIENT_REQUIRED',
-            ])->setStatusCode(400);
-        }
-
         $result = $this->xui->addUser($client);
+
+        if (($result['status'] ?? '') === 'ok') {
+            $link = $result['config'] ?? null;
+            if ($link) {
+                try {
+                    $qrResult = $this->xui->generateQrCode($client, $link);
+
+                    if (($qrResult['status'] ?? '') === 'ok') {
+                        $result['qr_status'] = 'ok';
+                        $result['qr_path']   = $qrResult['path'];
+                    } else {
+                        $result['qr_status'] = 'failed';
+                        $result['qr_error']  = $qrResult['message'] ?? $qrResult['error'] ?? 'UNKNOWN_ERROR';
+                    }
+                } catch (\Throwable $e) {
+                    $result['qr_status'] = 'failed';
+                    $result['qr_error']  = $e->getMessage();
+                }
+            } else {
+                $result['qr_status'] = 'skipped';
+                $result['qr_error']  = 'NO_CONFIG_LINK';
+            }
+        }
 
         return $this->response->setJSON($result);
     }
@@ -34,9 +50,9 @@ class XuiController extends BaseController
     {
         $inactive = $this->request->getGet('inactive') === '1';
 
-        $result = $this->xui->listUsers($inactive);
-
-        return $this->response->setJSON($result);
+        return $this->response->setJSON(
+            $this->xui->listUsers($inactive)
+        );
     }
 
     public function update()
@@ -45,32 +61,18 @@ class XuiController extends BaseController
         $mode   = $this->request->getPost('mode');
         $value  = $this->request->getPost('value');
 
-        if (!$client || !$mode) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'error'  => 'CLIENT_OR_MODE_REQUIRED',
-            ])->setStatusCode(400);
-        }
-
-        $result = $this->xui->updateUser($client, $mode, $value);
-
-        return $this->response->setJSON($result);
+        return $this->response->setJSON(
+            $this->xui->updateUser($client, $mode, $value)
+        );
     }
 
     public function delete()
     {
         $client = $this->request->getPost('client');
 
-        if (!$client) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'error'  => 'CLIENT_REQUIRED',
-            ])->setStatusCode(400);
-        }
-
-        $result = $this->xui->deleteUser($client);
-
-        return $this->response->setJSON($result);
+        return $this->response->setJSON(
+            $this->xui->deleteUser($client)
+        );
     }
 
     public function qr()
@@ -99,7 +101,32 @@ class XuiController extends BaseController
             ]);
         }
 
-        $result = $this->xui->generateQrCode($client, $link);
+        try {
+            $qrResult = $this->xui->generateQrCode($client, $link);
+
+            if (($qrResult['status'] ?? '') === 'ok') {
+                $result = [
+                    'status' => 'ok',
+                    'client' => $client,
+                    'qr_status' => 'ok',
+                    'qr_path' => $qrResult['path']
+                ];
+            } else {
+                $result = [
+                    'status' => 'ok',
+                    'client' => $client,
+                    'qr_status' => 'failed',
+                    'qr_error' => $qrResult['message'] ?? $qrResult['error'] ?? 'UNKNOWN_ERROR'
+                ];
+            }
+        } catch (\Throwable $e) {
+            $result = [
+                'status' => 'ok',
+                'client' => $client,
+                'qr_status' => 'failed',
+                'qr_error' => $e->getMessage()
+            ];
+        }
 
         return $this->response->setJSON($result);
     }
