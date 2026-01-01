@@ -29,11 +29,12 @@ class XuiService
         }
     }
 
-    public function addUser(string $clientName = null): array
+    public function addUser(string $clientName = null, int $initTraffic): array
     {
         $cmd = 'bash /root/scripts/add-xui.sh';
         if ($clientName) {
             $cmd .= ' ' . escapeshellarg($clientName);
+            $cmd .= ' ' . escapeshellarg($initTraffic);
         }
 
         $output = $this->ssh->runCommand($this->host, $cmd);

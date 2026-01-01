@@ -17,6 +17,7 @@ class XuiController extends BaseController
     public function add()
     {
         $client = $this->request->getPost('client');
+        $traffic = $this->request->getPost('traffic');
 
         if (!$client) {
             return $this->response->setJSON([
@@ -25,7 +26,7 @@ class XuiController extends BaseController
             ])->setStatusCode(400);
         }
 
-        $result = $this->xui->addUser($client);
+        $result = $this->xui->addUser($client, $traffic = 0);
 
         return $this->response->setJSON($result);
     }
