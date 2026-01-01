@@ -157,7 +157,10 @@ class XuiService
     public function generateQrCode(string $client, string $link): array
     {
         try {
-            $qr = QrCode::create($link);
+            $qr = new QrCode($link); // <- use constructor, not create()
+            $qr->setSize(300);
+            $qr->setMargin(10);
+
             $writer = new PngWriter();
             $result = $writer->write($qr);
 
@@ -177,4 +180,5 @@ class XuiService
             ];
         }
     }
+
 }
