@@ -18,7 +18,7 @@ $routes->get('/dbtest', function () {
 // --------------------
 // API routes
 // --------------------
-$routes->group('api', function ($routes) {
+$routes->group('api', ['filter' => 'api_auth'], function ($routes) {
 
     // OpenVPN Management
     $routes->group('openvpn', function ($routes) {
