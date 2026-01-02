@@ -5,43 +5,36 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-//$routes->get('/', 'Home::index');
 
+// --------------------
+// Testing routes
+// --------------------
 $routes->get('/sshtest', 'SshTest::index');
-//$routes->get('/add-openvpn', 'SshTest::addOpenVpn');
-//$routes->get('/delete-openvpn', 'SshTest::deleteOpenVpn');
+$routes->get('/dbtest', function () {
+    $db = \Config\Database::connect();
+    return "Platform: " . $db->getPlatform();
+});
 
 // --------------------
 // API routes
 // --------------------
 $routes->group('api', function ($routes) {
+
+    // OpenVPN Management
     $routes->group('openvpn', function ($routes) {
         $routes->post('add', 'Api\OpenVpnController::add');
         $routes->post('delete', 'Api\OpenVpnController::delete');
+        $routes->get('list', 'Api\OpenVpnController::list'); // This now handles Sync & Download
+        $routes->get('download/(:any)', 'Api\OpenVpnController::getFile/$1');
     });
 
+    // XUI Management
     $routes->group('xui', function ($routes) {
         $routes->post('add', 'Api\XuiController::add');
         $routes->post('update', 'Api\XuiController::update');
         $routes->post('delete', 'Api\XuiController::delete');
         $routes->get('list', 'Api\XuiController::list');
+        $routes->post('qr', 'Api\XuiController::qr');
     });
-});
 
-
-// ---------------------------------------------
-// SQLite connection test
-// ---------------------------------------------
-$routes->get('/dbtest', function () {
-    $db = \Config\Database::connect();
-    return $db->getPlatform();
-
-//    $db = \Config\Database::connect();
-//    try {
-//        $db->query("CREATE TABLE IF NOT EXISTS test_write (id INTEGER PRIMARY KEY)");
-//        $db->query("INSERT INTO test_write DEFAULT VALUES");
-//        return "Write Successful! Platform: " . $db->getPlatform();
-//    } catch (\Exception $e) {
-//        return "Read ok, but Write failed: " . $e->getMessage();
-//    }
 });
