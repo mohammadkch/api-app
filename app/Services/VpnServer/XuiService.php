@@ -144,19 +144,31 @@ class XuiService
     public function deleteUser(string $client): array
     {
         $cmd = "bash /root/scripts/delete-xui.sh " . escapeshellarg($client);
-
         $output = $this->ssh->runCommand($this->host, $cmd);
 
         if (preg_match('/__RESULT__=(\{.*\})/', $output, $m)) {
-
             $result = json_decode($m[1], true);
 
             if (isset($result['status']) && $result['status'] === 'ok') {
 
                 $qrFilePath = WRITEPATH . "storage/xui/{$client}.png";
-
                 if (file_exists($qrFilePath)) {
                     unlink($qrFilePath);
+                }
+
+                $accountModel = new AccountModel();
+
+                // Debugging point: ensure the query finds the record
+                $accountModel->where('client_name', $client)
+                    ->where('protocol', 'vless')
+                    ->delete();
+
+                // Verification
+                if ($accountModel->db->affectedRows() === 0) {
+                    $result['db_status'] = 'warning';
+                    $result['db_error'] = 'RECORD_NOT_FOUND_IN_DB';
+                } else {
+                    $result['db_status'] = 'deleted';
                 }
             }
 
