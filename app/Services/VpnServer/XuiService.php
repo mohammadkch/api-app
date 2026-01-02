@@ -97,50 +97,6 @@ class XuiService
         return $result;
     }
 
-    public function listUsers(bool $inactive = false): array
-    {
-        $cmd = 'bash /root/scripts/list-xui.sh';
-        if ($inactive) {
-            $cmd .= ' --inactive';
-        }
-
-        $output = $this->ssh->runCommand($this->host, $cmd);
-
-        if (preg_match('/__RESULT__=(\{.*\})/', $output, $m)) {
-            return json_decode($m[1], true) ?? [
-                'status' => 'error',
-                'error'  => 'INVALID_OUTPUT',
-                'raw'    => $output
-            ];
-        }
-
-        return [
-            'status' => 'error',
-            'error'  => 'NO_RESULT',
-            'raw'    => $output
-        ];
-    }
-
-    public function updateUser(string $client, string $mode, $value = null): array
-    {
-        $cmd = "bash /root/scripts/update-xui.sh " . escapeshellarg($client) . ' ' . escapeshellarg($mode);
-        if ($value !== null) {
-            $cmd .= ' ' . escapeshellarg((string)$value);
-        }
-
-        $output = $this->ssh->runCommand($this->host, $cmd);
-
-        if (preg_match('/__RESULT__=(\{.*\})/', $output, $m)) {
-            return json_decode($m[1], true);
-        }
-
-        return [
-            'status' => 'error',
-            'error'  => 'INVALID_SCRIPT_OUTPUT',
-            'raw'    => $output,
-        ];
-    }
-
     public function deleteUser(string $client): array
     {
         $cmd = "bash /root/scripts/delete-xui.sh " . escapeshellarg($client);
@@ -182,6 +138,26 @@ class XuiService
         ];
     }
 
+    public function updateUser(string $client, string $mode, $value = null): array
+    {
+        $cmd = "bash /root/scripts/update-xui.sh " . escapeshellarg($client) . ' ' . escapeshellarg($mode);
+        if ($value !== null) {
+            $cmd .= ' ' . escapeshellarg((string)$value);
+        }
+
+        $output = $this->ssh->runCommand($this->host, $cmd);
+
+        if (preg_match('/__RESULT__=(\{.*\})/', $output, $m)) {
+            return json_decode($m[1], true);
+        }
+
+        return [
+            'status' => 'error',
+            'error'  => 'INVALID_SCRIPT_OUTPUT',
+            'raw'    => $output,
+        ];
+    }
+
     public function getClientInfo(string $client): array
     {
         $users = $this->listUsers(true);
@@ -206,6 +182,74 @@ class XuiService
             'client' => $client
         ];
     }
+
+
+    public function listUsers(bool $inactive = false): array
+    {
+        $cmd = 'bash /root/scripts/list-xui.sh';
+
+        $output = $this->ssh->runCommand($this->host, $cmd);
+
+        if (preg_match('/__RESULT__=(\{.*\})/', $output, $m)) {
+            $result = json_decode($m[1], true);
+            $serverClients = $result['clients'] ?? [];
+
+            $accountModel = new AccountModel();
+            $processed = [];
+
+            foreach ($serverClients as $client) {
+                $clientName = $client['email'] ?? ($client['client'] ?? null);
+                if (!$clientName) continue;
+
+                $configLink = $client['config'] ?? null;
+
+                // 1. Sync Database
+                $data = [
+                    'server_id'           => 1,
+                    'client_name'         => $clientName,
+                    'protocol'            => 'vless',
+                    'uuid'                => $client['uuid'] ?? null,
+                    'traffic_total_bytes' => $client['total'] ?? 0,
+                    'config_link'         => $configLink,
+                    'status'              => ($client['enable'] ?? 1) == 1 ? 1 : 0
+                ];
+
+                $existing = $accountModel->where('client_name', $clientName)
+                    ->where('protocol', 'vless')
+                    ->first();
+
+                if ($existing) {
+                    $accountModel->update($existing['id'], $data);
+                } else {
+                    $accountModel->insert($data);
+                }
+
+                // 2. Manage QR Codes (If config link exists and file doesn't)
+                $qrPath = $this->storageDir . $clientName . '.png';
+                $qrStatus = 'exists';
+
+                if ($configLink && !file_exists($qrPath)) {
+                    $qrGen = $this->generateQrCode($clientName, $configLink);
+                    $qrStatus = $qrGen['qr_status'];
+                }
+
+                $processed[] = [
+                    'client' => $clientName,
+                    'status' => $data['status'],
+                    'qr'     => $qrStatus
+                ];
+            }
+
+            return [
+                'status' => 'ok',
+                'count'  => count($serverClients),
+                'processed' => $processed
+            ];
+        }
+
+        return ['status' => 'error', 'error' => 'INVALID_SSH_OUTPUT'];
+    }
+
 
     public function generateQrCode(string $client, string $config): array
     {
@@ -255,6 +299,5 @@ class XuiService
 
         return $qrResult;
     }
-
 
 }

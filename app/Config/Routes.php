@@ -34,7 +34,7 @@ $routes->group('api', ['filter' => 'api_auth'], function ($routes) {
         $routes->post('update', 'Api\XuiController::update');
         $routes->post('delete', 'Api\XuiController::delete');
         $routes->get('list', 'Api\XuiController::list');
-        $routes->post('qr', 'Api\XuiController::qr');
+        $routes->get('download/(:any)', 'Api\XuiController::download/$1'); // اضافه شد
     });
 
 });

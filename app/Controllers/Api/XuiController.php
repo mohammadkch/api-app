@@ -31,15 +31,6 @@ class XuiController extends BaseController
         return $this->response->setJSON($result);
     }
 
-    public function list()
-    {
-        $inactive = $this->request->getGet('inactive') === '1';
-
-        return $this->response->setJSON(
-            $this->xui->listUsers($inactive)
-        );
-    }
-
     public function update()
     {
         $client = $this->request->getPost('client');
@@ -74,34 +65,20 @@ class XuiController extends BaseController
         );
     }
 
-    public function qr()
+    public function list()
     {
-        $client = $this->request->getPost('client');
-
-        if (!$client) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'error' => 'CLIENT_REQUIRED'
-            ])->setStatusCode(400);
-        }
-
-        $info = $this->xui->getClientInfo($client);
-
-        if (($info['status'] ?? '') !== 'ok') {
-            return $this->response->setJSON($info);
-        }
-
-        $link = $info['config'] ?? null;
-
-        if (!$link) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'error'  => 'NO_CONFIG_LINK'
-            ]);
-        }
-
-        $result = $this->xui->generateQrCode($client, $link);
-
-        return $this->response->setJSON(array_merge($info, $result));
+        return $this->response->setJSON($this->xui->listUsers(true));
     }
+
+    public function download($clientName)
+    {
+        $path = WRITEPATH . "storage/xui/{$clientName}.png";
+
+        if (!file_exists($path)) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'QR_NOT_FOUND'])->setStatusCode(404);
+        }
+
+        return $this->response->download($path, null)->inline();
+    }
+
 }
