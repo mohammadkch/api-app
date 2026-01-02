@@ -148,7 +148,19 @@ class XuiService
         $output = $this->ssh->runCommand($this->host, $cmd);
 
         if (preg_match('/__RESULT__=(\{.*\})/', $output, $m)) {
-            return json_decode($m[1], true);
+
+            $result = json_decode($m[1], true);
+
+            if (isset($result['status']) && $result['status'] === 'ok') {
+
+                $qrFilePath = WRITEPATH . "storage/xui/{$client}.png";
+
+                if (file_exists($qrFilePath)) {
+                    unlink($qrFilePath);
+                }
+            }
+
+            return $result;
         }
 
         return [
