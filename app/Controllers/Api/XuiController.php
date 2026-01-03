@@ -11,7 +11,8 @@ class XuiController extends BaseController
 
     public function __construct()
     {
-        $this->xui = new XuiService('5.161.144.182');
+        // پورت سرور XUI رو همینجا یکبار تعریف می‌کنی
+        $this->xui = new XuiService('5.161.144.182', 2082);
     }
 
     public function add()

@@ -17,12 +17,14 @@ class XuiService
 {
     private SshClient $ssh;
     private string $host;
+    private int $port;
     private string $storageDir;
 
-    public function __construct(string $host)
+    public function __construct(string $host, int $port = 2082)
     {
         $this->ssh = new SshClient();
         $this->host = $host;
+        $this->port = $port;
         $this->storageDir = WRITEPATH . 'storage/xui/';
 
         if (!is_dir($this->storageDir)) {
@@ -158,99 +160,58 @@ class XuiService
         ];
     }
 
-    public function getClientInfo(string $client): array
-    {
-        $users = $this->listUsers(true);
-
-        if (($users['status'] ?? '') !== 'ok') {
-            return $users;
-        }
-
-        foreach ($users['clients'] ?? [] as $u) {
-            if (($u['email'] ?? '') === $client) {
-                return [
-                    'status' => 'ok',
-                    'client' => $client,
-                    'config' => $u['config'] ?? null
-                ];
-            }
-        }
-
-        return [
-            'status' => 'error',
-            'error' => 'CLIENT_NOT_FOUND',
-            'client' => $client
-        ];
-    }
-
-
-    public function listUsers(bool $inactive = false): array
+    public function listUsers(bool $activeOnly = false, bool $inactiveOnly = false): array
     {
         $cmd = 'bash /root/scripts/list-xui.sh';
+        if ($activeOnly) $cmd .= ' --active';
+        if ($inactiveOnly) $cmd .= ' --inactive';
 
         $output = $this->ssh->runCommand($this->host, $cmd);
 
-        if (preg_match('/__RESULT__=(\{.*\})/', $output, $m)) {
-            $result = json_decode($m[1], true);
-            $serverClients = $result['clients'] ?? [];
+        if (preg_match('/__RESULT__=(.*)/', $output, $m)) {
+            $serverClients = json_decode(trim($m[1]), true);
+            if (!is_array($serverClients)) return ['status' => 'error', 'error' => 'JSON_PARSE_FAILED'];
 
             $accountModel = new AccountModel();
             $processed = [];
 
             foreach ($serverClients as $client) {
-                $clientName = $client['email'] ?? ($client['client'] ?? null);
-                if (!$clientName) continue;
+                $clientName = $client['client'] ?? null;
+                $uuid = $client['uuid'] ?? null;
+                if (!$clientName || !$uuid) continue;
 
-                $configLink = $client['config'] ?? null;
+                $configLink = "vless://{$uuid}@{$this->host}:{$this->port}?type=tcp&security=none#{$clientName}";
 
-                // 1. Sync Database
                 $data = [
                     'server_id'           => 1,
                     'client_name'         => $clientName,
                     'protocol'            => 'vless',
-                    'uuid'                => $client['uuid'] ?? null,
-                    'traffic_total_bytes' => $client['total'] ?? 0,
-                    'config_link'         => $configLink,
-                    'status'              => ($client['enable'] ?? 1) == 1 ? 1 : 0
+                    'uuid'                => $uuid,
+                    'traffic_total_bytes' => ($client['total'] ?? 0) * 1024 * 1024 * 1024,
+                    'status'              => ($client['enable_val'] ?? 1) == 1 ? 1 : 0,
+                    'config_link'         => $configLink
                 ];
 
-                $existing = $accountModel->where('client_name', $clientName)
-                    ->where('protocol', 'vless')
-                    ->first();
-
+                $existing = $accountModel->where('client_name', $clientName)->where('protocol', 'vless')->first();
                 if ($existing) {
                     $accountModel->update($existing['id'], $data);
                 } else {
                     $accountModel->insert($data);
                 }
 
-                // 2. Manage QR Codes (If config link exists and file doesn't)
                 $qrPath = $this->storageDir . $clientName . '.png';
-                $qrStatus = 'exists';
-
-                if ($configLink && !file_exists($qrPath)) {
-                    $qrGen = $this->generateQrCode($clientName, $configLink);
-                    $qrStatus = $qrGen['qr_status'];
+                if (!file_exists($qrPath)) {
+                    $this->generateQrCode($clientName, $configLink);
                 }
 
-                $processed[] = [
-                    'client' => $clientName,
-                    'status' => $data['status'],
-                    'qr'     => $qrStatus
-                ];
+                $processed[] = $clientName;
             }
 
-            return [
-                'status' => 'ok',
-                'count'  => count($serverClients),
-                'processed' => $processed
-            ];
+            return ['status' => 'ok', 'synced_count' => count($processed)];
         }
 
         return ['status' => 'error', 'error' => 'INVALID_SSH_OUTPUT'];
     }
-
-
     public function generateQrCode(string $client, string $config): array
     {
         $qrResult = [
