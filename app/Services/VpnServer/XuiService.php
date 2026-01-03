@@ -169,6 +169,17 @@ class XuiService
         $output = $this->ssh->runCommand($this->host, $cmd);
 
         if (preg_match('/__RESULT__=(.*)/', $output, $m)) {
+            $rawJson = trim($m[1]);
+            $serverClients = json_decode($rawJson, true);
+
+            if (!is_array($serverClients)) {
+                return [
+                    'status' => 'error',
+                    'error'  => 'JSON_PARSE_FAILED',
+                    'debug_raw_after_regex' => $rawJson, // این خط را اضافه کن
+                    'full_ssh_output' => $output        // این خط را هم اضافه کن
+                ];
+            }
             $serverClients = json_decode(trim($m[1]), true);
             if (!is_array($serverClients)) return ['status' => 'error', 'error' => 'JSON_PARSE_FAILED'];
 
