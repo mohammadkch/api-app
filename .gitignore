@@ -67,8 +67,11 @@ writable/debugbar/*
 !/writable/storage/.gitkeep
 
 # --- Database Files (ADD THESE) ---
-writable/app.db
-writable/app.db-journal
+writable/database/*
+!writable/database/index.html
+
+*.db
+app.db
 # ----------------------------------
 
 php_errors.log
