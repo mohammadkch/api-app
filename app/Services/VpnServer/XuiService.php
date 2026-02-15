@@ -166,60 +166,74 @@ class XuiService
 
         $output = $this->ssh->runCommand($this->host, $cmd);
 
-        if (preg_match('/__RESULT__=(.*)/', $output, $m)) {
-            $rawJson = trim($m[1]);
-            $serverClients = json_decode($rawJson, true);
-
-            if (!is_array($serverClients)) {
-                return [
-                    'status' => 'error',
-                    'error'  => 'JSON_PARSE_FAILED',
-                    'debug_raw_after_regex' => $rawJson,
-                    'full_ssh_output' => $output
-                ];
-            }
-
-            // این خط اضافی حذف شد - دیگه دوبار decode نمی‌کنه!
-
-            $accountModel = new AccountModel();
-            $processed = [];
-
-            foreach ($serverClients as $client) {
-                $clientName = $client['client'] ?? null;
-                $uuid = $client['uuid'] ?? null;
-                if (!$clientName || !$uuid) continue;
-
-                $configLink = "vless://{$uuid}@{$this->host}:{$this->port}?type=tcp&security=none#{$clientName}";
-
-                $data = [
-                    'server_id'           => 1,
-                    'client_name'         => $clientName,
-                    'protocol'            => 'vless',
-                    'uuid'                => $uuid,
-                    'traffic_total_bytes' => ($client['total'] ?? 0) * 1024 * 1024 * 1024,
-                    'status'              => ($client['enable_val'] ?? 1) == 1 ? 1 : 0,
-                    'config_link'         => $configLink
-                ];
-
-                $existing = $accountModel->where('client_name', $clientName)->where('protocol', 'vless')->first();
-                if ($existing) {
-                    $accountModel->update($existing['id'], $data);
-                } else {
-                    $accountModel->insert($data);
-                }
-
-                $qrPath = $this->storageDir . $clientName . '.png';
-                if (!file_exists($qrPath)) {
-                    $this->generateQrCode($clientName, $configLink);
-                }
-
-                $processed[] = $clientName;
-            }
-
-            return ['status' => 'ok', 'synced_count' => count($processed)];
+        // Parse shell script output
+        if (!preg_match('/__RESULT__=(.*)/s', $output, $m)) {
+            return ['status' => 'error', 'error' => 'INVALID_SSH_OUTPUT', 'raw' => $output];
         }
 
-        return ['status' => 'error', 'error' => 'INVALID_SSH_OUTPUT'];
+        $rawJson = trim($m[1]);
+        $serverClients = json_decode($rawJson, true);
+
+        // Check if JSON parsing failed
+        if (!is_array($serverClients)) {
+            return [
+                'status' => 'error',
+                'error'  => 'JSON_PARSE_FAILED',
+                'debug_raw_json' => $rawJson,
+                'json_error' => json_last_error_msg()
+            ];
+        }
+
+        $accountModel = new AccountModel();
+        $processed = [];
+
+        foreach ($serverClients as $client) {
+            $clientName = $client['client'] ?? null;
+            $uuid = $client['uuid'] ?? null;
+
+            if (!$clientName || !$uuid) {
+                continue;
+            }
+
+            // Build config link
+            $configLink = "vless://{$uuid}@{$this->host}:{$this->port}?type=tcp&security=none#{$clientName}";
+
+            // Prepare data for database
+            $data = [
+                'server_id'           => 1,
+                'client_name'         => $clientName,
+                'protocol'            => 'vless',
+                'uuid'                => $uuid,
+                'traffic_total_bytes' => $client['total'] ?? 0,
+                'status'              => ($client['enable_val'] ?? 1) == 1 ? 1 : 0,
+                'config_link'         => $configLink
+            ];
+
+            // Insert or Update
+            $existing = $accountModel->where('client_name', $clientName)
+                ->where('protocol', 'vless')
+                ->first();
+
+            if ($existing) {
+                $accountModel->update($existing['id'], $data);
+            } else {
+                $accountModel->insert($data);
+            }
+
+            // Generate QR Code if not exists
+            $qrPath = $this->storageDir . $clientName . '.png';
+            if (!file_exists($qrPath)) {
+                $this->generateQrCode($clientName, $configLink);
+            }
+
+            $processed[] = $clientName;
+        }
+
+        return [
+            'status' => 'ok',
+            'synced_count' => count($processed),
+            'clients' => $processed
+        ];
     }
 
     public function generateQrCode(string $client, string $config): array
