@@ -20,10 +20,10 @@ class XuiController extends BaseController
         $client = $this->request->getPost('client');
         $traffic = $this->request->getPost('traffic');
 
-        if (!$client) {
+        if (!$client || !$traffic) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'error'  => 'CLIENT_REQUIRED'
+                'error'  => 'CLIENT_AND_TRAFFIC_REQUIRED'
             ])->setStatusCode(400);
         }
 
