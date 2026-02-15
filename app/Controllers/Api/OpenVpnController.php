@@ -4,40 +4,35 @@ namespace App\Controllers\Api;
 
 use App\Controllers\BaseController;
 use App\Services\VpnServer\OpenVpnService;
-use http\Env\Response;
 
 class OpenVpnController extends BaseController
 {
-    private OpenVpnService $vpn;
-
-    public function __construct()
-    {
-        $this->vpn = new OpenVpnService('5.161.144.182');
-    }
-
     /**
      * Add a VPN client
      */
     public function add()
     {
+        $serverId = $this->request->getPost('server_id');
         $client = $this->request->getPost('client');
 
-        if (!$client) {
-            return $this->response->setJSON(['status' => 'error', 'error' => 'CLIENT_REQUIRED'])->setStatusCode(400);
+        // Validation
+        if (!$serverId || !$client) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'error' => 'SERVER_ID_AND_CLIENT_REQUIRED'
+            ])->setStatusCode(400);
         }
 
-        $result = $this->vpn->addClient($client);
-
-        if (($result['status'] ?? '') === 'ok') {
-            $download = $this->vpn->downloadConfig($client);
-
-            if ($download['status'] === 'ok') {
-                // This is the link your bot will use to get the file
-                $result['config_url'] = base_url("api/ovpn/download/{$client}");
-            }
+        try {
+            $vpn = new OpenVpnService((int)$serverId);
+            $result = $vpn->addClient($client);
+            return $this->response->setJSON($result);
+        } catch (\RuntimeException $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'error' => $e->getMessage()
+            ])->setStatusCode(400);
         }
-
-        return $this->response->setJSON($result);
     }
 
     /**
@@ -45,60 +40,75 @@ class OpenVpnController extends BaseController
      */
     public function delete()
     {
+        $serverId = $this->request->getPost('server_id');
         $client = $this->request->getPost('client');
 
-        if (!$client) {
+        if (!$serverId || !$client) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'error'  => 'CLIENT_REQUIRED'
+                'error'  => 'SERVER_ID_AND_CLIENT_REQUIRED'
             ])->setStatusCode(400);
         }
 
-        $result = $this->vpn->deleteClient($client);
-
-        return $this->response->setJSON($result);
+        try {
+            $vpn = new OpenVpnService((int)$serverId);
+            $result = $vpn->deleteClient($client);
+            return $this->response->setJSON($result);
+        } catch (\RuntimeException $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'error' => $e->getMessage()
+            ])->setStatusCode(400);
+        }
     }
 
     /**
-     * List all VPN clients
+     * List all VPN clients for a server
      */
     public function list()
     {
-        return $this->response->setJSON(
-            $this->vpn->listClients()
-        );
+        $serverId = $this->request->getGet('server_id');
+
+        if (!$serverId) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'error' => 'SERVER_ID_REQUIRED'
+            ])->setStatusCode(400);
+        }
+
+        try {
+            $vpn = new OpenVpnService((int)$serverId);
+            return $this->response->setJSON($vpn->listClients());
+        } catch (\RuntimeException $e) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'error' => $e->getMessage()
+            ])->setStatusCode(400);
+        }
     }
 
     /**
      * Download an existing client's .ovpn file
      */
-    public function download()
+    public function download(int $serverId, string $clientName)
     {
-        $client = $this->request->getPost('client');
+        try {
+            $vpn = new OpenVpnService($serverId);
+            $path = $vpn->getFilePath($clientName);
 
-        if (!$client) {
+            if (!$path) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'error'  => 'FILE_NOT_FOUND'
+                ])->setStatusCode(404);
+            }
+
+            return $this->response->download($path, null)->setFileName("{$clientName}.ovpn");
+        } catch (\RuntimeException $e) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'error'  => 'CLIENT_REQUIRED'
+                'error' => $e->getMessage()
             ])->setStatusCode(400);
         }
-
-        $result = $this->vpn->downloadConfig($client);
-
-        return $this->response->setJSON($result);
-    }
-
-    public function getFile(string $clientName)
-    {
-        $path = WRITEPATH . "storage/openvpn/{$clientName}.ovpn";
-
-        if (!file_exists($path)) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'error'  => 'FILE_NOT_FOUND'
-            ])->setStatusCode(404);
-        }
-
-        return $this->response->download($path, null)->setFileName("{$clientName}.ovpn");
     }
 }

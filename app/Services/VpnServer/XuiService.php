@@ -4,6 +4,7 @@ namespace App\Services\VpnServer;
 
 use App\Libraries\SshClient;
 use App\Models\AccountModel;
+use App\Models\ServerModel;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
@@ -16,29 +17,45 @@ use RuntimeException;
 class XuiService
 {
     private SshClient $ssh;
+    private array $server;
+    private int $serverId;
     private string $host;
     private int $port;
+    private string $tunnelDomain;
     private string $storageDir;
 
-    public function __construct(string $host, int $port = 2082)
+    public function __construct(int $serverId)
     {
+        $serverModel = new ServerModel();
+        $this->server = $serverModel->find($serverId);
+
+        if (!$this->server) {
+            throw new RuntimeException("Server with ID {$serverId} not found");
+        }
+
+        if ($this->server['vpn_type'] !== 'xui') {
+            throw new RuntimeException("Server {$serverId} is not an XUI server");
+        }
+
         $this->ssh = new SshClient();
-        $this->host = $host;
-        $this->port = $port;
-        $this->storageDir = WRITEPATH . 'storage/xui/';
+        $this->serverId = $serverId;
+        $this->host = $this->server['ip_address'];
+        $this->port = $this->server['vpn_port'];
+        $this->tunnelDomain = $this->server['tunnel_domain'];
+
+        // Storage directory per server
+        $this->storageDir = WRITEPATH . "storage/xui/{$serverId}/";
 
         if (!is_dir($this->storageDir)) {
             mkdir($this->storageDir, 0755, true);
         }
     }
 
-    public function addUser(string $clientName = null, int $initTraffic = 0): array
+    public function addUser(string $clientName, int $initTraffic): array
     {
         $cmd = 'bash /root/scripts/add-xui.sh';
-        if ($clientName) {
-            $cmd .= ' ' . escapeshellarg($clientName);
-            $cmd .= ' ' . escapeshellarg($initTraffic);
-        }
+        $cmd .= ' ' . escapeshellarg($clientName);
+        $cmd .= ' ' . escapeshellarg($initTraffic);
 
         $output = $this->ssh->runCommand($this->host, $cmd);
 
@@ -53,13 +70,16 @@ class XuiService
         }
 
         if (($result['status'] ?? '') === 'ok') {
-            $link = $result['config'] ?? null;
-            if ($link) {
+            $uuid = $result['uuid'] ?? null;
+            $configLink = "vless://{$uuid}@{$this->tunnelDomain}:{$this->port}?type=tcp&security=none#{$clientName}";
+
+            // Generate QR Code
+            if ($uuid) {
                 try {
-                    $qrResult = $this->generateQrCode($clientName, $link);
+                    $qrResult = $this->generateQrCode($clientName, $configLink);
                     if (($qrResult['qr_status'] ?? '') === 'ok') {
                         $result['qr_status'] = 'ok';
-                        $result['qr_path']   = $qrResult['qr_path'];
+                        $result['download_url'] = base_url("api/xui/download/{$this->serverId}/{$clientName}");
                     } else {
                         $result['qr_status'] = 'failed';
                         $result['qr_error']  = $qrResult['qr_error'] ?? 'UNKNOWN_ERROR';
@@ -70,25 +90,31 @@ class XuiService
                 }
             } else {
                 $result['qr_status'] = 'skipped';
-                $result['qr_error']  = 'NO_CONFIG_LINK';
+                $result['qr_error']  = 'NO_UUID';
             }
-        }
 
-        if (($result['status'] ?? '') === 'ok') {
+            // Save to database
             $accountModel = new AccountModel();
 
-            $data = [
-                'server_id' => 1,
-                'client_name' => $result['client'],
+            $metadata = json_encode([
                 'protocol' => 'vless',
-                'uuid' => $result['uuid'] ?? null,
-                'traffic_limit_gb' => $initTraffic,
-                'traffic_total_bytes' => ($initTraffic * 1024 * 1024 * 1024),
-                'config_link' => $result['config'] ?? null,
+                'uuid' => $uuid,
+                'inbound_id' => $result['inbound_id'] ?? null,
+                'config' => $configLink
+            ]);
+
+            $data = [
+                'server_id' => $this->serverId,
+                'client_name' => $clientName,
+                'file_name' => $clientName . '.png',
+                'traffic_total_bytes' => $initTraffic * 1024 * 1024 * 1024,
+                'traffic_used_bytes' => 0,
+                'metadata' => $metadata,
                 'status' => 1
             ];
 
-            $existing = $accountModel->where('client_name', $result['client'])->first();
+            $existing = $accountModel->getByClientAndServer($clientName, $this->serverId);
+
             if ($existing) {
                 $accountModel->update($existing['id'], $data);
             } else {
@@ -108,23 +134,21 @@ class XuiService
             $result = json_decode($m[1], true);
 
             if (isset($result['status']) && $result['status'] === 'ok') {
-
-                $qrFilePath = WRITEPATH . "storage/xui/{$client}.png";
+                // Delete QR code file
+                $qrFilePath = $this->storageDir . $client . '.png';
                 if (file_exists($qrFilePath)) {
                     unlink($qrFilePath);
                 }
 
+                // Database cleanup
                 $accountModel = new AccountModel();
+                $existing = $accountModel->getByClientAndServer($client, $this->serverId);
 
-                $accountModel->where('client_name', $client)
-                    ->where('protocol', 'vless')
-                    ->delete();
-
-                if ($accountModel->db->affectedRows() === 0) {
-                    $result['db_status'] = 'warning';
-                    $result['db_error'] = 'RECORD_NOT_FOUND_IN_DB';
-                } else {
+                if ($existing) {
+                    $accountModel->delete($existing['id']);
                     $result['db_status'] = 'deleted';
+                } else {
+                    $result['db_status'] = 'not_found';
                 }
             }
 
@@ -196,23 +220,29 @@ class XuiService
             }
 
             // Build config link
-            $configLink = "vless://{$uuid}@{$this->host}:{$this->port}?type=tcp&security=none#{$clientName}";
+            $configLink = "vless://{$uuid}@{$this->tunnelDomain}:{$this->port}?type=tcp&security=none#{$clientName}";
+
+            // Prepare metadata
+            $metadata = json_encode([
+                'protocol' => 'vless',
+                'uuid' => $uuid,
+                'inbound_id' => null,
+                'config' => $configLink
+            ]);
 
             // Prepare data for database
             $data = [
-                'server_id'           => 1,
+                'server_id'           => $this->serverId,
                 'client_name'         => $clientName,
-                'protocol'            => 'vless',
-                'uuid'                => $uuid,
+                'file_name'           => $clientName . '.png',
                 'traffic_total_bytes' => $client['total'] ?? 0,
-                'status'              => ($client['enable_val'] ?? 1) == 1 ? 1 : 0,
-                'config_link'         => $configLink
+                'traffic_used_bytes'  => 0,
+                'metadata'            => $metadata,
+                'status'              => ($client['enable_val'] ?? 1) == 1 ? 1 : 0
             ];
 
             // Insert or Update
-            $existing = $accountModel->where('client_name', $clientName)
-                ->where('protocol', 'vless')
-                ->first();
+            $existing = $accountModel->getByClientAndServer($clientName, $this->serverId);
 
             if ($existing) {
                 $accountModel->update($existing['id'], $data);
@@ -226,11 +256,15 @@ class XuiService
                 $this->generateQrCode($clientName, $configLink);
             }
 
-            $processed[] = $clientName;
+            $processed[] = [
+                'client' => $clientName,
+                'download_url' => base_url("api/xui/download/{$this->serverId}/{$clientName}")
+            ];
         }
 
         return [
             'status' => 'ok',
+            'server_id' => $this->serverId,
             'synced_count' => count($processed),
             'clients' => $processed
         ];
@@ -278,5 +312,14 @@ class XuiService
         }
 
         return $qrResult;
+    }
+
+    /**
+     * Get file path for download
+     */
+    public function getFilePath(string $clientName): ?string
+    {
+        $filePath = $this->storageDir . $clientName . '.png';
+        return file_exists($filePath) ? $filePath : null;
     }
 }

@@ -9,9 +9,14 @@ class AccountModel extends Model
     protected $table            = 'accounts';
     protected $primaryKey       = 'id';
     protected $allowedFields    = [
-        'server_id', 'inbound_id', 'client_name', 'protocol',
-        'uuid', 'traffic_limit_gb', 'traffic_total_bytes',
-        'expiry_date', 'config_link', 'qr_path', 'status'
+        'server_id',
+        'client_name',
+        'file_name',           // "client.png" or "client.ovpn"
+        'traffic_total_bytes',
+        'traffic_used_bytes',
+        'expiry_date',
+        'metadata',            // JSON: protocol, uuid, inbound_id, config
+        'status'
     ];
 
     protected $useTimestamps    = true;
@@ -21,11 +26,45 @@ class AccountModel extends Model
     /**
      * Get account with server details
      */
-    public function getAccountWithServer(string $clientName)
+    public function getAccountWithServer(string $clientName, int $serverId = null)
     {
-        return $this->select('accounts.*, servers.ip_address, servers.type as server_type')
+        $builder = $this->select('accounts.*, servers.ip_address, servers.vpn_type, servers.vpn_port, servers.tunnel_domain')
             ->join('servers', 'servers.id = accounts.server_id')
-            ->where('accounts.client_name', $clientName)
+            ->where('accounts.client_name', $clientName);
+
+        if ($serverId) {
+            $builder->where('accounts.server_id', $serverId);
+        }
+
+        return $builder->first();
+    }
+
+    /**
+     * Get all accounts for a specific server
+     */
+    public function getAccountsByServer(int $serverId)
+    {
+        return $this->where('server_id', $serverId)->findAll();
+    }
+
+    /**
+     * Get account by client name and server
+     */
+    public function getByClientAndServer(string $clientName, int $serverId)
+    {
+        return $this->where('client_name', $clientName)
+            ->where('server_id', $serverId)
             ->first();
+    }
+
+    /**
+     * Parse metadata JSON
+     */
+    public function parseMetadata(array $account)
+    {
+        if (isset($account['metadata'])) {
+            $account['metadata'] = json_decode($account['metadata'], true);
+        }
+        return $account;
     }
 }

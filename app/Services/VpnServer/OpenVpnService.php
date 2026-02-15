@@ -4,22 +4,39 @@ namespace App\Services\VpnServer;
 
 use App\Libraries\SshClient;
 use App\Models\AccountModel;
+use App\Models\ServerModel;
 use RuntimeException;
 
 class OpenVpnService
 {
     private SshClient $ssh;
+    private array $server;
+    private int $serverId;
     private string $host;
+    private string $tunnelDomain;
     private string $remoteOvpnDir = '/root';
     private string $localOvpnDir;
-    private string $tunnelHost;
 
-    public function __construct(string $host = '5.161.144.182')
+    public function __construct(int $serverId)
     {
+        $serverModel = new ServerModel();
+        $this->server = $serverModel->find($serverId);
+
+        if (!$this->server) {
+            throw new RuntimeException("Server with ID {$serverId} not found");
+        }
+
+        if ($this->server['vpn_type'] !== 'openvpn') {
+            throw new RuntimeException("Server {$serverId} is not an OpenVPN server");
+        }
+
         $this->ssh = new SshClient();
-        $this->host = $host;
-        $this->localOvpnDir = WRITEPATH . 'storage/openvpn/';
-        $this->tunnelHost = 'ov.kouchnet.site';
+        $this->serverId = $serverId;
+        $this->host = $this->server['ip_address'];
+        $this->tunnelDomain = $this->server['tunnel_domain'];
+
+        // Storage directory per server
+        $this->localOvpnDir = WRITEPATH . "storage/openvpn/{$serverId}/";
 
         if (!is_dir($this->localOvpnDir)) {
             mkdir($this->localOvpnDir, 0755, true);
@@ -34,25 +51,37 @@ class OpenVpnService
             $result = json_decode($m[1], true);
 
             if (isset($result['status']) && $result['status'] === 'ok') {
+                // Download the config file
+                $download = $this->downloadConfig($clientName);
+
+                if ($download['status'] === 'ok') {
+                    $result['download_url'] = base_url("api/openvpn/download/{$this->serverId}/{$clientName}");
+                }
+
+                // Save to database
                 $accountModel = new AccountModel();
 
+                $metadata = json_encode([
+                    'protocol' => 'ovpn'
+                ]);
+
                 $data = [
-                    'server_id'   => 1,
+                    'server_id'   => $this->serverId,
                     'client_name' => $clientName,
-                    'protocol'    => 'ovpn',
-                    'status'      => 1,
-                    'config_link' => $this->tunnelHost
+                    'file_name'   => $clientName . '.ovpn',
+                    'metadata'    => $metadata,
+                    'status'      => 1
                 ];
 
-                $existing = $accountModel->where('client_name', $clientName)
-                    ->where('protocol', 'ovpn')
-                    ->first();
+                $existing = $accountModel->getByClientAndServer($clientName, $this->serverId);
+
                 if ($existing) {
                     $accountModel->update($existing['id'], $data);
                 } else {
                     $accountModel->insert($data);
                 }
             }
+
             return $result;
         }
 
@@ -86,9 +115,14 @@ class OpenVpnService
 
             // Database cleanup
             $accountModel = new AccountModel();
-            $accountModel->where('client_name', $clientName)
-                ->where('protocol', 'ovpn')
-                ->delete();
+            $existing = $accountModel->getByClientAndServer($clientName, $this->serverId);
+
+            if ($existing) {
+                $accountModel->delete($existing['id']);
+                $resultArray['db_status'] = 'deleted';
+            } else {
+                $resultArray['db_status'] = 'not_found';
+            }
         }
 
         return $resultArray;
@@ -101,7 +135,7 @@ class OpenVpnService
 
         try {
             $this->ssh->downloadFile($this->host, $remoteFile, $localFile);
-            $this->rewriteRemote($localFile, $this->tunnelHost);
+            $this->rewriteRemote($localFile, $this->tunnelDomain);
         } catch (RuntimeException $e) {
             return [
                 'status' => 'error',
@@ -148,20 +182,23 @@ class OpenVpnService
             $processed = [];
 
             foreach ($serverClients as $clientName) {
-                // 1. Download and rewrite the .ovpn file
+                // Download and rewrite the .ovpn file
                 $download = $this->downloadConfig($clientName);
 
-                // 2. Check and update Database
-                $existing = $accountModel->where('client_name', $clientName)
-                    ->where('protocol', 'ovpn')
-                    ->first();
+                // Prepare metadata
+                $metadata = json_encode([
+                    'protocol' => 'ovpn'
+                ]);
+
+                // Check and update Database
+                $existing = $accountModel->getByClientAndServer($clientName, $this->serverId);
 
                 $data = [
-                    'server_id'   => 1,
+                    'server_id'   => $this->serverId,
                     'client_name' => $clientName,
-                    'protocol'    => 'ovpn',
-                    'status'      => 1,
-                    'config_link' => $this->tunnelHost
+                    'file_name'   => $clientName . '.ovpn',
+                    'metadata'    => $metadata,
+                    'status'      => 1
                 ];
 
                 if ($existing) {
@@ -172,12 +209,14 @@ class OpenVpnService
 
                 $processed[] = [
                     'client' => $clientName,
-                    'file_status' => $download['status'] ?? 'error'
+                    'file_status' => $download['status'] ?? 'error',
+                    'download_url' => base_url("api/openvpn/download/{$this->serverId}/{$clientName}")
                 ];
             }
 
             return [
                 'status' => 'ok',
+                'server_id' => $this->serverId,
                 'total' => count($serverClients),
                 'processed_clients' => $processed
             ];
@@ -187,5 +226,14 @@ class OpenVpnService
             'status' => 'error',
             'error'  => 'INVALID_SCRIPT_OUTPUT'
         ];
+    }
+
+    /**
+     * Get file path for download
+     */
+    public function getFilePath(string $clientName): ?string
+    {
+        $filePath = $this->localOvpnDir . $clientName . '.ovpn';
+        return file_exists($filePath) ? $filePath : null;
     }
 }

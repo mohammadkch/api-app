@@ -24,8 +24,8 @@ $routes->group('api', ['filter' => 'api_auth'], function ($routes) {
     $routes->group('openvpn', function ($routes) {
         $routes->post('add', 'Api\OpenVpnController::add');
         $routes->post('delete', 'Api\OpenVpnController::delete');
-        $routes->get('list', 'Api\OpenVpnController::list'); // This now handles Sync & Download
-        $routes->get('download/(:any)', 'Api\OpenVpnController::getFile/$1');
+        $routes->get('list', 'Api\OpenVpnController::list');  // ?server_id=1
+        $routes->get('download/(:num)/(:any)', 'Api\OpenVpnController::download/$1/$2');
     });
 
     // XUI Management
@@ -33,8 +33,8 @@ $routes->group('api', ['filter' => 'api_auth'], function ($routes) {
         $routes->post('add', 'Api\XuiController::add');
         $routes->post('update', 'Api\XuiController::update');
         $routes->post('delete', 'Api\XuiController::delete');
-        $routes->get('list', 'Api\XuiController::list');
-        $routes->get('download/(:any)', 'Api\XuiController::download/$1'); // اضافه شد
+        $routes->get('list', 'Api\XuiController::list');  // ?server_id=1
+        $routes->get('download/(:num)/(:any)', 'Api\XuiController::download/$1/$2');
     });
 
 });
