@@ -116,12 +116,10 @@ class XuiService
 
                 $accountModel = new AccountModel();
 
-                // Debugging point: ensure the query finds the record
                 $accountModel->where('client_name', $client)
                     ->where('protocol', 'vless')
                     ->delete();
 
-                // Verification
                 if ($accountModel->db->affectedRows() === 0) {
                     $result['db_status'] = 'warning';
                     $result['db_error'] = 'RECORD_NOT_FOUND_IN_DB';
@@ -176,12 +174,12 @@ class XuiService
                 return [
                     'status' => 'error',
                     'error'  => 'JSON_PARSE_FAILED',
-                    'debug_raw_after_regex' => $rawJson, // این خط را اضافه کن
-                    'full_ssh_output' => $output        // این خط را هم اضافه کن
+                    'debug_raw_after_regex' => $rawJson,
+                    'full_ssh_output' => $output
                 ];
             }
-            $serverClients = json_decode(trim($m[1]), true);
-            if (!is_array($serverClients)) return ['status' => 'error', 'error' => 'JSON_PARSE_FAILED'];
+
+            // این خط اضافی حذف شد - دیگه دوبار decode نمی‌کنه!
 
             $accountModel = new AccountModel();
             $processed = [];
@@ -223,6 +221,7 @@ class XuiService
 
         return ['status' => 'error', 'error' => 'INVALID_SSH_OUTPUT'];
     }
+
     public function generateQrCode(string $client, string $config): array
     {
         $qrResult = [
@@ -239,7 +238,6 @@ class XuiService
         $qrFile = $qrDir . $client . '.png';
 
         try {
-
             $builder = new Builder(
                 writer: new PngWriter(),
                 writerOptions: [],
@@ -252,12 +250,8 @@ class XuiService
                 roundBlockSizeMode: RoundBlockSizeMode::Margin,
                 labelText: $client,
                 labelFont: new OpenSans(20),
-                labelAlignment: LabelAlignment::Center,
-//                logoPath: null,
-//                logoResizeToWidth: null,
-//                logoPunchoutBackground: true
+                labelAlignment: LabelAlignment::Center
             );
-
 
             $result = $builder->build();
             $result->saveToFile($qrFile);
@@ -271,5 +265,4 @@ class XuiService
 
         return $qrResult;
     }
-
 }
