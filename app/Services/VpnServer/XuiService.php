@@ -71,8 +71,8 @@ class XuiService
 
         if (($result['status'] ?? '') === 'ok') {
             $uuid = $result['uuid'] ?? null;
-            $configLink = "vless://{$uuid}@{$this->tunnelDomain}:{$this->port}?type=tcp&security=none#{$clientName}";
-
+//            $configLink = "vless://{$uuid}@{$this->tunnelDomain}:{$this->port}?type=tcp&security=none#{$clientName}";
+            $configLink = $result['config'];
             // Generate QR Code
             if ($uuid) {
                 try {
@@ -219,8 +219,9 @@ class XuiService
                 continue;
             }
 
-            // Build config link
-            $configLink = "vless://{$uuid}@{$this->tunnelDomain}:{$this->port}?type=tcp&security=none#{$clientName}";
+            // Build config link with remark
+            $remark = $client['remark'] ?? 'default';
+            $configLink = "vless://{$uuid}@{$this->tunnelDomain}:{$this->port}?type=tcp&security=none#{$remark}-{$clientName}";
 
             // Prepare metadata
             $metadata = json_encode([
