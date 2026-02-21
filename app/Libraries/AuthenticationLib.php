@@ -19,8 +19,6 @@ class AuthenticationLib {
     public function login( $userID, $additionalData = [] )
     {
         $additionalData['userID'] = $userID ;
-
-
         $this->session->set( $additionalData );
 
         return TRUE ;
@@ -38,7 +36,6 @@ class AuthenticationLib {
     public function isLoggedIn()
     {
         $sessionUserID = $this->session->get('userID');
-        $sessionRoleID = $this->session->get('roleID');
 
         if (! empty( $sessionUserID)) {
             if ( $sessionUserID > 0 ) {

@@ -16,6 +16,11 @@ $routes->get('/dbtest', function () {
 });
 
 // --------------------
+// admin panel routes
+// --------------------
+$routes->get('/admin/login', 'Admin\LoginController::index');
+
+// --------------------
 // API routes
 // --------------------
 $routes->group('api', ['filter' => 'api_auth'], function ($routes) {

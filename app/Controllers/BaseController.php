@@ -26,6 +26,12 @@ abstract class BaseController extends Controller
      */
 
     // protected $session;
+    protected $helpers = [];
+
+
+    protected $viewPath = 'admin/' ;
+    protected $viewData ;
+    protected $authLib ;
 
     /**
      * @return void
@@ -41,5 +47,15 @@ abstract class BaseController extends Controller
 
         // Preload any models, libraries, etc, here.
         // $this->session = service('session');
+
+        helper('html');
+        $this->authLib = service('Authentication');
+
+        $this->viewData['assetsPath'] = base_url('assets/admin');
+
+        $this->viewData['className'] = $this->authLib->getClassName() ;
+        $this->viewData['controllerName'] = $this->authLib->getControllerName() ;
+        $this->viewData['methodName'] = $this->authLib->getMethodName();
+        $this->viewData['fullname'] = $this->authLib->getLoginData( 'fullname' );
     }
 }

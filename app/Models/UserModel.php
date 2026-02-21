@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class UserModel extends Model
 {
-    protected $table = 'admins';
+    protected $table = 'user';
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
     protected $returnType = 'array';
@@ -29,15 +29,15 @@ class UserModel extends Model
     protected $skipValidation = false;
 
     /**
-     * Get admin by username and password
+     * Get user by username and password
      */
-    public function getAdmin(array $where)
+    public function getUser(array $where)
     {
         return $this->where($where)->first();
     }
 
     /**
-     * Get admin by username
+     * Get user by username
      */
     public function getByUsername(string $username)
     {
@@ -47,15 +47,15 @@ class UserModel extends Model
     /**
      * Update last login time
      */
-    public function updateLastLogin(int $adminId)
+    public function updateLastLogin(int $userId)
     {
-        return $this->update($adminId, [
+        return $this->update($userId, [
             'last_login' => date('Y-m-d H:i:s')
         ]);
     }
 
     /**
-     * Get all admins
+     * Get all users
      */
     public function getAll()
     {
