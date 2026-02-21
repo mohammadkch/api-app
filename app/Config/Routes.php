@@ -19,6 +19,8 @@ $routes->get('/dbtest', function () {
 // admin panel routes
 // --------------------
 $routes->get('/admin/login', 'Admin\LoginController::index');
+$routes->post('/admin/login', 'Admin\LoginController::authenticate');
+$routes->get('/admin/dashboard', 'Admin\DashboardController::index');
 
 // --------------------
 // API routes

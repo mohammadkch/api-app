@@ -18,7 +18,7 @@ class LoginController extends BaseController
 
         $this->viewData['msg_text'] = isset($msg_text[$msg]) ? $msg_text[$msg] : null;
 
-        return view($this->viewPath . 'auth/login');
+        return view($this->viewPath . 'login/login');
     }
 
     public function authenticate()
@@ -29,24 +29,23 @@ class LoginController extends BaseController
         $username = $this->request->getPost('username', FILTER_CALLBACK, ['options' => 'sanitizeStripTags']);
         $password = $this->request->getPost('password', FILTER_CALLBACK, ['options' => 'sanitizeStripTags']);
 
-        $user_rowset = $userModel->getUser([
+        $user = $userModel->getUser([
             'username' => $username,
             'password' => $password
         ]);
 
-
-        if (count($user_rowset) != 1) {
+        if ($user === NULL) {
             return redirect()->to('admin/login?msg=1');
         }
 
-        $user_id = (int)$user_rowset[0]['id'];
-        $user_fullname = $user_rowset[0]['fullname'];
+        $user_id = (int)$user['id'];
+        $user_full_name = $user['full_name'];
 
         if ($user_id < 1) {
             return redirect()->to('admin/login?msg=2');
         }
 
-        $login_result = $this->authLib->login($user_id, ['fullname' => $user_fullname]);
+        $login_result = $this->authLib->login($user_id, ['fullname' => $user_full_name]);
 
         if ($login_result) {
             return redirect()->to('admin/dashboard');
