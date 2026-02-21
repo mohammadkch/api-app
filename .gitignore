@@ -28,7 +28,24 @@ Vagrantfile
 #-------------------------
 # Writable Directory - Ignore Everything
 #-------------------------
+# Ignore everything inside writable
 writable/*
+
+# Allow folders
+!writable/**/
+
+# Allow gitkeep files
+!writable/**/.gitkeep
+
+# Allow index.html files
+!writable/**/index.html
+
+# Ignore everything else again
+writable/**/*
+
+# Re-allow gitkeep and index.html (override last rule)
+!writable/**/.gitkeep
+!writable/**/index.html
 
 #-------------------------
 # User Guide Temp Files
