@@ -11,4 +11,16 @@ class DashboardController extends BaseController
         return view( $this->viewPath . 'dashboard/index' , $this->viewData );
 //        return view( $this->viewPath . 'dashboard/index-main' , $this->viewData );
     }
+
+    public function logout()
+    {
+        $logout = $this->authLib->logout() ;
+
+        if ( $logout == true ) {
+            return redirect()->to('admin/login');
+        }
+        else {
+            return redirect()->to('admin/dashboard');
+        }
+    }
 }

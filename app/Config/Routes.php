@@ -20,6 +20,7 @@ $routes->get('/dbtest', function () {
 // --------------------
 $routes->get('/admin/login', 'Admin\LoginController::index');
 $routes->post('/admin/login', 'Admin\LoginController::authenticate');
+$routes->get('/admin/logout', 'Admin\DashboardController::logout');
 $routes->get('/admin/dashboard', 'Admin\DashboardController::index');
 
 // --------------------
