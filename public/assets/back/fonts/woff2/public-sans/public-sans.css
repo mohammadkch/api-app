@@ -1,0 +1,397 @@
+/* assets/back/fonts/public-sans/public-sans.css */
+
+/* ==================== LATIN ==================== */
+
+/* LATIN - NORMAL */
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 100;
+    font-display: swap;
+    src: url('public-sans-latin-100-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 200;
+    font-display: swap;
+    src: url('public-sans-latin-200-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: url('public-sans-latin-300-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('public-sans-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('public-sans-latin-500-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('public-sans-latin-600-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('public-sans-latin-700-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 800;
+    font-display: swap;
+    src: url('public-sans-latin-800-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 900;
+    font-display: swap;
+    src: url('public-sans-latin-900-normal.woff2') format('woff2');
+}
+
+/* LATIN - ITALIC */
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 100;
+    font-display: swap;
+    src: url('public-sans-latin-100-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 200;
+    font-display: swap;
+    src: url('public-sans-latin-200-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 300;
+    font-display: swap;
+    src: url('public-sans-latin-300-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 400;
+    font-display: swap;
+    src: url('public-sans-latin-400-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 500;
+    font-display: swap;
+    src: url('public-sans-latin-500-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 600;
+    font-display: swap;
+    src: url('public-sans-latin-600-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 700;
+    font-display: swap;
+    src: url('public-sans-latin-700-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 800;
+    font-display: swap;
+    src: url('public-sans-latin-800-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 900;
+    font-display: swap;
+    src: url('public-sans-latin-900-italic.woff2') format('woff2');
+}
+
+/* ==================== LATIN-EXT ==================== */
+
+/* LATIN-EXT - NORMAL */
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 100;
+    font-display: swap;
+    src: url('public-sans-latin-ext-100-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 200;
+    font-display: swap;
+    src: url('public-sans-latin-ext-200-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: url('public-sans-latin-ext-300-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('public-sans-latin-ext-400-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('public-sans-latin-ext-500-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('public-sans-latin-ext-600-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('public-sans-latin-ext-700-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 800;
+    font-display: swap;
+    src: url('public-sans-latin-ext-800-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 900;
+    font-display: swap;
+    src: url('public-sans-latin-ext-900-normal.woff2') format('woff2');
+}
+
+/* LATIN-EXT - ITALIC */
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 100;
+    font-display: swap;
+    src: url('public-sans-latin-ext-100-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 200;
+    font-display: swap;
+    src: url('public-sans-latin-ext-200-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 300;
+    font-display: swap;
+    src: url('public-sans-latin-ext-300-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 400;
+    font-display: swap;
+    src: url('public-sans-latin-ext-400-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 500;
+    font-display: swap;
+    src: url('public-sans-latin-ext-500-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 600;
+    font-display: swap;
+    src: url('public-sans-latin-ext-600-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 700;
+    font-display: swap;
+    src: url('public-sans-latin-ext-700-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 800;
+    font-display: swap;
+    src: url('public-sans-latin-ext-800-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 900;
+    font-display: swap;
+    src: url('public-sans-latin-ext-900-italic.woff2') format('woff2');
+}
+
+/* ==================== VIETNAMESE ==================== */
+
+/* VIETNAMESE - NORMAL */
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 100;
+    font-display: swap;
+    src: url('public-sans-vietnamese-100-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 200;
+    font-display: swap;
+    src: url('public-sans-vietnamese-200-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: url('public-sans-vietnamese-300-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('public-sans-vietnamese-400-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('public-sans-vietnamese-500-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('public-sans-vietnamese-600-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('public-sans-vietnamese-700-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 800;
+    font-display: swap;
+    src: url('public-sans-vietnamese-800-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: normal;
+    font-weight: 900;
+    font-display: swap;
+    src: url('public-sans-vietnamese-900-normal.woff2') format('woff2');
+}
+
+/* VIETNAMESE - ITALIC */
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 100;
+    font-display: swap;
+    src: url('public-sans-vietnamese-100-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 200;
+    font-display: swap;
+    src: url('public-sans-vietnamese-200-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 300;
+    font-display: swap;
+    src: url('public-sans-vietnamese-300-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 400;
+    font-display: swap;
+    src: url('public-sans-vietnamese-400-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 500;
+    font-display: swap;
+    src: url('public-sans-vietnamese-500-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 600;
+    font-display: swap;
+    src: url('public-sans-vietnamese-600-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 700;
+    font-display: swap;
+    src: url('public-sans-vietnamese-700-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 800;
+    font-display: swap;
+    src: url('public-sans-vietnamese-800-italic.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Public Sans';
+    font-style: italic;
+    font-weight: 900;
+    font-display: swap;
+    src: url('public-sans-vietnamese-900-italic.woff2') format('woff2');
+}

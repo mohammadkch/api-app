@@ -18,10 +18,19 @@ $routes->get('/dbtest', function () {
 // --------------------
 // admin panel routes
 // --------------------
-$routes->get('/admin/login', 'Admin\LoginController::index');
-$routes->post('/admin/login', 'Admin\LoginController::authenticate');
-$routes->get('/admin/logout', 'Admin\DashboardController::logout');
-$routes->get('/admin/dashboard', 'Admin\DashboardController::index');
+
+
+$routes->group('admin', ['filter' => 'admin_auth'], function ($routes) {
+    $routes->get('/', 'Admin\DashboardController::index');
+    $routes->get('dashboard', 'Admin\DashboardController::index');
+
+    $routes->get('login', 'Admin\LoginController::index');
+    $routes->post('login', 'Admin\LoginController::authenticate');
+
+    $routes->get('logout', 'Admin\LogoutController::index');
+    $routes->post('logout', 'Admin\LogoutController::index');
+});
+
 
 // --------------------
 // API routes

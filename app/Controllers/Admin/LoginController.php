@@ -54,4 +54,5 @@ class LoginController extends BaseController
         return redirect()->to('login?msg=3');
 
     }
+
 }
