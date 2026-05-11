@@ -2,10 +2,10 @@
 
 namespace App\Controllers\Api;
 
-use App\Controllers\BaseController;
+use App\Controllers\ApiBaseController;
 use App\Services\VpnServer\XuiService;
 
-class XuiController extends BaseController
+class XuiController extends ApiBaseController
 {
     /**
      * Add a XUI user

@@ -4,7 +4,7 @@
         <div class="logo-wrapper logo-wrapper-center">
             <a href="<?php echo site_url('admin/dashboard') ?>" data-bs-original-title="" title="">
 <!--                <img class="img-fluid for-white" src="--><?php //echo base_url() ?><!--assets/back/images/logo/full-white.png" alt="logo">-->
-                <h3 class="mb-2" style="color: white">سامانه حقوق و مزایا</h3>
+                <h3 class="mb-2" style="color: white">پنل ادمین</h3>
             </a>
             <div class="back-btn">
                 <i class="fa fa-angle-left"></i>
@@ -44,7 +44,7 @@
                         </a>
                         <ul class="sidebar-submenu">
                             <li>
-                                <a href="<?php echo site_url('admin/user/index'); ?>">نمایش کاربران</a>
+                                <a href="<?php echo site_url('admin/user'); ?>">نمایش کاربران</a>
                             </li>
                             <li>
                                 <a href="<?php echo site_url('admin/user/create'); ?>">افزودن کاربر جدید</a>

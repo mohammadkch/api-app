@@ -2,10 +2,11 @@
 
 namespace App\Controllers\Api;
 
-use App\Controllers\BaseController;
+use App\Controllers\Admin\BaseController;
+use App\Controllers\ApiBaseController;
 use App\Services\VpnServer\OpenVpnService;
 
-class OpenVpnController extends BaseController
+class OpenVpnController extends ApiBaseController
 {
     /**
      * Add a VPN client

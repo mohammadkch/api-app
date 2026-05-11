@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Admin;
 
 use CodeIgniter\Controller;
 use CodeIgniter\HTTP\RequestInterface;
@@ -53,9 +53,14 @@ abstract class BaseController extends Controller
 
         $this->viewData['assetsPath'] = base_url('assets/admin');
 
-        $this->viewData['className'] = $this->authLib->getClassName() ;
+        $this->viewData['className'] = str_replace('controller', '', $this->authLib->getClassName());
         $this->viewData['controllerName'] = $this->authLib->getControllerName() ;
         $this->viewData['methodName'] = $this->authLib->getMethodName();
         $this->viewData['fullname'] = $this->authLib->getLoginData( 'fullname' );
+    }
+    protected function flash($key, $customMessage = null)
+    {
+        helper('flash');
+        setFlash($key, $customMessage);
     }
 }
