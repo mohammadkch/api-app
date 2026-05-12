@@ -17,23 +17,44 @@
                         <div class="card-body">
                             <div class="title-header option-title">
                                 <h5>لیست کاربران</h5>
-                                <a href="<?= base_url('admin/user/create') ?>" class="btn btn-solid">افزودن کاربر جدید</a>
+                                <a href="<?= base_url('admin/user/create') ?>" class="btn btn-solid">افزودن کاربر
+                                    جدید</a>
                             </div>
 
                             <!-- فرم سرچ -->
                             <div class="search-filters mb-4">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <input type="text" name="username" class="form-control search-input" placeholder="نام کاربری ...">
+                                <form id="searchForm" method="post">
+                                    <div class="row">
+                                        <?php helper('form'); ?>
+                                        <?php foreach ($search_fields as $field_name => $field): ?>
+                                            <div class="col-md-2 col-lg-2 mb-2">
+                                                <?php if ($field['input'] == 'form_input'): ?>
+                                                    <?= form_input(
+                                                            array_merge($field['data'], ['name' => $field_name, 'id' => $field_name]),
+                                                            '',
+                                                            ['class' => 'form-control search-input']
+                                                    ) ?>
+                                                <?php elseif ($field['input'] == 'form_dropdown'): ?>
+                                                    <?= form_dropdown(
+                                                            $field_name,
+                                                            $field['options'],
+                                                            '',
+                                                            array_merge($field['data'], ['id' => $field_name])
+                                                    ) ?>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endforeach; ?>
+                                        <div class="col-md-2 col-lg-2 mb-2">
+                                            <button type="button" id="searchBtn" class="btn btn-primary w-100">جستجو
+                                            </button>
+                                        </div>
+                                        <div class="col-md-2 col-lg-2 mb-2">
+                                            <button type="button" id="resetBtn" class="btn btn-secondary w-100">ریست
+                                                فرم جستجو
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <input type="text" name="full_name" class="form-control search-input" placeholder="نام کامل ...">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <button type="button" id="searchBtn" class="btn btn-primary">جستجو</button>
-                                        <button type="button" id="resetBtn" class="btn btn-secondary">بازنشانی</button>
-                                    </div>
-                                </div>
+                                </form>
                             </div>
 
                             <div id="search-result">
@@ -84,13 +105,12 @@
     <script src="<?= base_url() ?>assets/back/js/jquery.dataTables.js"></script>
 
     <script>
-        // تابع نمایش صفحه با fetch
+
         async function showPage(url = null, excel = false) {
             if (!url) {
                 url = window.location.href.split('?')[0];
             }
 
-            // جمع‌آوری مقادیر سرچ
             const searchInputs = document.querySelectorAll('.search-input');
             const formData = new URLSearchParams();
 
@@ -132,57 +152,66 @@
             }
         }
 
-        // تابع بازنشانی
         function resetFilters() {
+
             document.querySelectorAll('.search-input').forEach(input => {
                 input.value = '';
             });
+
+            document.querySelectorAll('select.search-input').forEach(select => {
+                select.value = '';
+                if ($(select).hasClass('select2-hidden-accessible')) {
+                    $(select).val('').trigger('change');
+                }
+            });
+
             showPage();
         }
 
-        $(document).ready(function() {
-            // رویداد کلیک دکمه جستجو
-            $('#searchBtn').on('click', function() {
+
+        $(document).ready(function () {
+
+            $('.search-input-dropdown').select2({
+                width: '100%',
+            });
+
+            $('#searchBtn').on('click', function () {
                 showPage();
             });
 
-            // رویداد کلیک دکمه بازنشانی
-            $('#resetBtn').on('click', function() {
+            $('#resetBtn').on('click', function () {
                 resetFilters();
             });
 
-            // رویداد اینتر در فیلدهای سرچ
-            $('.search-input').on('keypress', function(e) {
+            $('.search-input').on('keypress', function (e) {
                 if (e.which === 13) {
                     showPage();
                 }
             });
 
-            // حذف کاربر
             let deleteId = null;
 
-            $(document).on('click', 'a[data-bs-toggle="modal"]', function() {
+            $(document).on('click', 'a[data-bs-toggle="modal"]', function () {
                 deleteId = $(this).data('id');
             });
 
-            $('#confirmDelete').on('click', function() {
+            $('#confirmDelete').on('click', function () {
                 if (deleteId) {
                     $.ajax({
                         url: '<?= base_url("admin/user/delete") ?>/' + deleteId,
                         type: 'DELETE',
                         dataType: 'json',
-                        success: function(response) {
+                        success: function (response) {
                             if (response.status === 'success') {
                                 showNotif('success', 'موفق', response.message);
-                                setTimeout(function() {
-                                    showPage();
-                                }, 1500);
+                                $('#deleteModal').modal('hide');
+                                showPage()
                             } else {
                                 showNotif('danger', 'خطا', response.message);
                                 $('#deleteModal').modal('hide');
                             }
                         },
-                        error: function() {
+                        error: function () {
                             showNotif('danger', 'خطا', 'مشکلی در حذف کاربر پیش آمده است.');
                             $('#deleteModal').modal('hide');
                         }

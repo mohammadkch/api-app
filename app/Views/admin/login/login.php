@@ -15,7 +15,9 @@
         body {
             font-family: 'Vazirmatn', sans-serif;
             height: 100vh;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            /*background: linear-gradient(135deg, #667eea, #764ba2);*/
+            background-color: #0099d1;
+            background-image: url("<?php echo base_url('assets/auth') ?>/brick-wall-dark.png");
             display: flex;
             align-items: center;
             justify-content: center;

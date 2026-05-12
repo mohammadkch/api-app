@@ -47,6 +47,10 @@ writable/**/*
 !writable/**/.gitkeep
 !writable/**/index.html
 
+
+# Ignore all files in avatars except .gitkeep
+public/uploads/avatars/*
+!public/uploads/avatars/.gitkeep
 #-------------------------
 # User Guide Temp Files
 #-------------------------

@@ -36,9 +36,9 @@ $routes->group('admin', ['filter' => 'admin_auth'], function ($routes) {
     $routes->get('user/create', 'Admin\UserController::create');
     $routes->post('user/create/handle', 'Admin\UserController::formHandler/create');
     $routes->get('user/edit/(:num)', 'Admin\UserController::edit/$1');
-    $routes->post('user/edit/handle/(:num)', 'Admin\UserController::formHandler/edit/$1');
+    $routes->post('user/edit/(:num)/handle', 'Admin\UserController::formHandler/edit/$1');
     $routes->delete('user/delete/(:num)', 'Admin\UserController::delete/$1');
-    $routes->post('admin/user/updateCityOptions', 'Admin\UserController::updateCityOptions');
+    $routes->post('user/updateCityOptions', 'Admin\UserController::updateCityOptions');
 });
 
 

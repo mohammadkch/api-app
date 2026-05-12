@@ -29,7 +29,9 @@
     <link rel="stylesheet" type="text/css" href="<?= base_url() ?>assets/back/css/vendors/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="<?= base_url() ?>assets/back/css/style.css">
     <link rel="stylesheet" type="text/css" href="<?= base_url() ?>assets/back/css/font.css">
+    <link rel="stylesheet" type="text/css" href="<?= base_url() ?>assets/back/css/select2.min.css">
     <link rel="stylesheet" type="text/css" href="<?= base_url() ?>assets/back/css/custom.css">
+
 
     <!-- ========== styles of pages ========== -->
     <?= $this->renderSection('styles') ?>
@@ -128,6 +130,33 @@
         }
         hr.send(body);
     }
+</script>
+
+<script>
+    $(document).ready(function() {
+        var currentUrl = window.location.pathname;
+
+        if (currentUrl.includes('/dashboard')) {
+            $('#dashboard-link').addClass('active');
+        }
+
+        if (currentUrl.includes('/user')) {
+            $('#user-menu-link').addClass('active');
+            $('#user-menu-link').next('.sidebar-submenu').css('display', 'block');
+        }
+
+        if (currentUrl === '<?= site_url('admin/user') ?>') {
+            $('#user-list-link').addClass('active');
+        }
+        if (currentUrl === '<?= site_url('admin/user/create') ?>') {
+            $('#user-create-link').addClass('active');
+        }
+
+        $('.linear-icon-link').on('click', function(e) {
+            e.preventDefault();
+            $(this).next('.sidebar-submenu').slideToggle();
+        });
+    });
 </script>
 
 <!-- ========== scripts of pages ========== -->
