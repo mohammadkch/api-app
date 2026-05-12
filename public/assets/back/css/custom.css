@@ -140,3 +140,41 @@ html[dir="rtl"] .page-wrapper.compact-wrapper .page-header.close_icon {
         justify-content: space-between;
     }
 }
+
+/* add by cooch */
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    cursor: auto;
+    background-color: #fff;
+    border-color: #dee2e6;
+}
+
+/* ظاهر مقدار انتخاب شده در حالت عادی */
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #212529 !important;
+    font-weight: 400 !important;
+    font-size: 14px !important;
+    line-height: 34px !important;
+}
+
+/* حذف هرگونه border اضافی */
+.select2-container--default .select2-selection--single {
+    border: 1px solid #ced4da !important;
+    border-radius: 4px !important;
+    background-color: #fff !important;
+}
+
+/* حذف افکت focus */
+.select2-container--default.select2-container--focus .select2-selection--single {
+    border-color: #86b7fe !important;
+    outline: 0 !important;
+    box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25) !important;
+}

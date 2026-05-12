@@ -32,7 +32,8 @@ class LoginController extends BaseController
         ]);
 
         if ($user === NULL) {
-            return redirect()->to('admin/login?msg=1');
+            $this->flash('user_not_found');
+            return redirect()->to('admin/login');
         }
 
         $user_id = (int)$user['id'];

@@ -16,6 +16,9 @@
 
     <!-- ========== استایل‌های عمومی (همیشه لود می‌شوند) ========== -->
     <link href="<?= base_url('assets/back/fonts/woff2/public-sans/public-sans.css') ?>" rel="stylesheet">
+<!--    <link-->
+<!--            href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"-->
+<!--            rel="stylesheet">-->
     <link rel="stylesheet" href="<?= base_url() ?>assets/back/css/linearicon.css">
     <link rel="stylesheet" type="text/css" href="<?= base_url() ?>assets/back/css/vendors/font-awesome.css">
     <link rel="stylesheet" type="text/css" href="<?= base_url() ?>assets/back/css/vendors/themify.css">
@@ -80,8 +83,11 @@
 </div>
 
 <!-- ========== common scripts ========== -->
+
 <script src="<?= base_url() ?>assets/back/js/jquery-3.6.0.min.js"></script>
 <script src="<?= base_url() ?>assets/back/js/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="<?= base_url() ?>assets/back/js/select2.min.js"></script>
+<script src="<?= base_url() ?>assets/back/js/select2-custom.js"></script>
 <script src="<?= base_url() ?>assets/back/js/icons/feather-icon/feather.min.js"></script>
 <script src="<?= base_url() ?>assets/back/js/icons/feather-icon/feather-icon.js"></script>
 <script src="<?= base_url() ?>assets/back/js/scrollbar/simplebar.js"></script>
@@ -93,7 +99,6 @@
 <script src="<?= base_url() ?>assets/back/js/customizer.js"></script>
 <script src="<?= base_url() ?>assets/back/js/sidebareffect.js"></script>
 <script src="<?= base_url() ?>assets/back/js/script.js"></script>
-
 <script src="<?= base_url() ?>assets/back/js/custom.js"></script>
 
 <?php helper('flash'); ?>

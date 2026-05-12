@@ -7,27 +7,129 @@ class UserController extends BaseController
 
     public function index()
     {
+        helper('sanitize');
+        $pager = service('pager');
+        $userModel = model('UserModel');
 
+        $page = (int) $this->request->getGet('page' , FILTER_VALIDATE_INT );
+        $page = $page > 0 ? $page : 1 ;
+
+        $username = $this->request->getPost('username' , FILTER_CALLBACK, ['options' => 'sanitizeStripTags'] );
+        $full_name = $this->request->getPost( 'full_name' , FILTER_CALLBACK, ['options' => 'sanitizeStripTags'] );
+        $role = $this->request->getPost( 'role' , FILTER_CALLBACK, ['options' => 'sanitizeStripTags'] );
+
+        $condition = [] ;
+
+        if (strlen($username) > 0)      $condition['username'] = $username ;
+        if (strlen($full_name)> 0)      $condition['full_name'] = $full_name ;
+        if (strlen($role ) > 0)         $condition['role'] = $role ;
+
+        $per_page = 5 ;
+        $total_rows = $userModel->getData( $condition, null, 0, true );
+        $rowset = $userModel->getData( $condition, $per_page, ($page - 1 ) * $per_page);
+        $pagination = $pager->makeLinks($page, $per_page, $total_rows, 'admin_pagination');
+
+        $this->viewData['pagination'] = $pagination ;
+        $this->viewData['rowset'] = $rowset ;
+        $this->viewData['edit_pk'] = $userModel->primaryKey ;
+
+        $this->viewData['search_fields'] = [
+//            'customer_type_id' 	    => [ 'input' => 'form_dropdown','data' => [], 'options' => array_column( $customer_types, 'customer_type_text' , 'customer_type_id' ) ],
+            'username' 	        => [ 'input' => 'form_input',   'data' => [], 'type' => 'text' ],
+            'full_name' 	    => [ 'input' => 'form_input',   'data' => [], 'type' => 'text' ],
+        ];
+
+        if ($this->request->isAJAX()) {
+            return view($this->viewPath . 'user/index_data_table', $this->viewData);
+        }
+
+        return view($this->viewPath . 'user/index', $this->viewData);
     }
 
     public function create($task = null)
     {
+        helper('fields');
+
         if ($task == 'handle') {
             return $this->formHandler('create', 0);
         }
 
-        $this->viewData['form_action'] = isset($this->viewData['form_action']) ? $this->viewData['form_action'] : 'admin/' . $this->viewData['className'] . '/create/handle';
-        $this->viewData['user_roles'] = [
-            'admin'   => 'مدیر',
-            'editor'  => 'ویرایشگر',
-            'viewer'  => 'بازدیدکننده'
+        $fieldModel = model('FieldModel');
+        $stateModel = model('StateModel');
+        $cityModel = model('CityModel');
+
+        $fields_name = $fieldModel->getFieldName(['user', 'city', 'state']);
+
+        $state_rowset = $stateModel->findAll();
+        $city_rowset = $cityModel->findAll();
+
+        $state_options = ['' => 'انتخاب کنید'];
+        foreach ($state_rowset as $row) {
+            $state_options[$row['state_id']] = $row['state_name'];
+        }
+
+        $city_options = ['' => 'انتخاب کنید'];
+        foreach ($city_rowset as $row) {
+            $city_options[$row['city_id']] = $row['city_name'];
+        }
+
+        $this->viewData['inputs'] = [
+            'username' => [
+                'input' => 'form_input',
+                'data' => ['placeholder' => $fields_name['username'] ?? 'نام کاربری', 'class' => 'form-control'],
+                'type' => 'text'
+            ],
+            'full_name' => [
+                'input' => 'form_input',
+                'data' => ['placeholder' => $fields_name['full_name'] ?? 'نام کامل', 'class' => 'form-control'],
+                'type' => 'text'
+            ],
+            'password' => [
+                'input' => 'form_input',
+                'data' => ['placeholder' => $fields_name['password'] ?? 'گذرواژه', 'class' => 'form-control'],
+                'type' => 'password'
+            ],
+            'confirm_password' => [
+                'input' => 'form_input',
+                'data' => ['placeholder' => 'تکرار گذرواژه', 'class' => 'form-control'],
+                'type' => 'password'
+            ],
+            'role' => [
+                'input' => 'form_dropdown',
+                'data' => ['class' => 'form-control'],
+                'options' => [
+                    '' => 'انتخاب نقش',
+                    'admin' => 'مدیر',
+                    'editor' => 'ویرایشگر',
+                    'viewer' => 'بازدیدکننده'
+                ]
+            ],
+            'state_id' => [
+                'input' => 'form_dropdown',
+                'data' => [
+                    'class' => 'form-control',
+                    'onchange' => "updateCityOptions('" . site_url('admin/user/updateCityOptions') . "')"
+                ],
+                'options' => $state_options
+            ],
+            'city_id' => [
+                'input' => 'form_dropdown',
+                'data' => ['class' => 'form-control'],
+                'options' => $city_options
+            ],
+            'avatar' => [
+                'input' => 'form_upload',
+                'data' => ['accept' => 'image/*', 'class' => 'form-control'],
+                'type' => 'file'
+            ]
         ];
 
-//        $this->flash('loading');
+        $this->viewData['fields_name'] = mergeFieldsName($fields_name, $this->viewData['inputs']);
+        $this->viewData['form_action'] = 'admin/' . $this->viewData['className'] . '/create/handle';
+        $this->viewData['className'] = 'user';
 
         return view($this->viewPath . 'user/create', $this->viewData);
     }
-
     public function edit( $id , $task = null)
     {
         $id = (int) $id ;
@@ -64,15 +166,21 @@ class UserController extends BaseController
         $userModel = model('UserModel');
         $fieldModel = model('FieldModel');
 
-
+        // قوانین اعتبارسنجی پایه
         $validation_rules = [
             'full_name' => 'required|min_length[3]',
             'username'  => 'required|min_length[3]',
             'password'  => 'min_length[6]',
             'confirm_password' => 'matches[password]',
-            'role'      => 'required|in_list[admin,editor,viewer]'
+            'role'      => 'required|in_list[admin,editor,viewer]',
+            'city_id'   => 'required|is_natural_no_zero'
         ];
 
+        // قوانین مربوط به آپلود
+        $avatar = $this->request->getFile('avatar');
+        if ($avatar && $avatar->isValid() && !$avatar->hasMoved()) {
+            $validation_rules['avatar'] = 'is_image[avatar]|max_size[avatar,2048]|ext_in[avatar,jpg,jpeg,png,gif]';
+        }
 
         if ($task == 'edit') {
             $validation_rules['username'] = 'required|min_length[3]|is_unique[user.username,id,' . $id . ']';
@@ -90,14 +198,13 @@ class UserController extends BaseController
 
         foreach ($validation_rules as $field_name => $validation_rule) {
             $rules[$field_name] = [
-                'label' => array_key_exists($field_name, $field_label) ? $field_label[$field_name] : lang('FieldsText.' . $field_name, [], 'fa'),
+                'label' => array_key_exists($field_name, $field_label) ? $field_label[$field_name] : lang('Fields.' . $field_name, [], 'fa'),
                 'rules' => $validation_rule
             ];
         }
 
         if (!$this->validate($rules)) {
             $this->viewData['validation_errors'] = $validation->getErrors();
-
             $this->flash('validation_error');
 
             if ($task == 'edit') {
@@ -107,19 +214,53 @@ class UserController extends BaseController
             }
         }
 
+        // دریافت داده‌ها
         $full_name = $this->request->getPost('full_name', FILTER_DEFAULT);
         $username = $this->request->getPost('username', FILTER_DEFAULT);
         $password = $this->request->getPost('password', FILTER_CALLBACK, ['options' => 'sanitizeStripTags']);
         $role = $this->request->getPost('role', FILTER_DEFAULT);
+        $city_id = $this->request->getPost('city_id', FILTER_VALIDATE_INT);
 
         $model_data = [
             'full_name' => $full_name,
             'username'  => $username,
-            'role'      => $role
+            'role'      => $role,
+            'city_id'   => $city_id
         ];
 
         if (!empty($password)) {
             $model_data['password'] = password_hash($password, PASSWORD_DEFAULT);
+        }
+
+        // ========== هندل آپلود عکس ==========
+        if ($avatar && $avatar->isValid() && !$avatar->hasMoved()) {
+            // پوشه آپلود رو چک کن
+            $uploadPath = WRITEPATH . 'uploads/avatars/';
+            if (!is_dir($uploadPath)) {
+                mkdir($uploadPath, 0777, true);
+            }
+
+            // حذف فایل قدیمی در ویرایش
+            if ($task == 'edit') {
+                $existingUser = $userModel->find($id);
+                if ($existingUser && !empty($existingUser['avatar'])) {
+                    $oldFile = WRITEPATH . '../public/' . $existingUser['avatar'];
+                    if (file_exists($oldFile)) {
+                        unlink($oldFile);
+                    }
+                }
+            }
+
+            // ذخیره فایل جدید
+            $newName = $avatar->getRandomName();
+            $avatar->move($uploadPath, $newName);
+            $model_data['avatar'] = 'uploads/avatars/' . $newName;
+        } elseif ($task == 'edit') {
+            // در ویرایش، اگه عکس جدید نیومد، قبلی رو نگه دار
+            $existingUser = $userModel->find($id);
+            if ($existingUser && isset($existingUser['avatar'])) {
+                $model_data['avatar'] = $existingUser['avatar'];
+            }
         }
 
         if ($task == 'create') {
@@ -146,5 +287,16 @@ class UserController extends BaseController
             return redirect()->to('admin/' . $this->viewData['className']);
         }
     }
+
+    public function updateCityOptions()
+    {
+        $state_id = $this->request->getPost('state_id');
+
+        $cityModel = model('CityModel');
+        $cities = $cityModel->where('state_id', $state_id)->findAll();
+
+        return $this->response->setJSON($cities);
+    }
+
 
 }

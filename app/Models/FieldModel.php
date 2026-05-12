@@ -22,7 +22,9 @@ class FieldModel extends Model {
                 if ($query) {
                     $result = $query->getResultArray();
                     foreach ($result as $row) {
-                        $output[$row['name']] = $row['name'];
+                        $fieldName = $row['name'];
+                        $label = lang('Fields.' . $fieldName, [], 'fa');
+                        $output[$fieldName] = ($label != 'Fields.' . $fieldName) ? $label : $fieldName;
                     }
                 }
             } else {
