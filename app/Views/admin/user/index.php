@@ -5,7 +5,7 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('styles') ?>
-    <link rel="stylesheet" type="text/css" href="<?= base_url() ?>assets/back/css/datatables.css">
+    <link rel="stylesheet" type="text/css" href="<?= $assetsPath ?>css/datatables.css">
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
@@ -102,7 +102,7 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
-    <script src="<?= base_url() ?>assets/back/js/jquery.dataTables.js"></script>
+    <script src="<?= $assetsPath ?>js/jquery.dataTables.js"></script>
 
     <script>
 
@@ -160,9 +160,9 @@
 
             document.querySelectorAll('select.search-input').forEach(select => {
                 select.value = '';
-                if ($(select).hasClass('select2-hidden-accessible')) {
-                    $(select).val('').trigger('change');
-                }
+                // if ($(select).hasClass('select2-hidden-accessible')) {
+                //     $(select).val('').trigger('change');
+                // }
             });
 
             showPage();
@@ -170,10 +170,10 @@
 
 
         $(document).ready(function () {
-
-            $('.search-input-dropdown').select2({
-                width: '100%',
-            });
+            //
+            // $('.search-input-dropdown').select2({
+            //     width: '100%',
+            // });
 
             $('#searchBtn').on('click', function () {
                 showPage();

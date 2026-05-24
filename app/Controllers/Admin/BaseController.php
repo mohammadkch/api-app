@@ -51,7 +51,7 @@ abstract class BaseController extends Controller
         helper('html');
         $this->authLib = service('Authentication');
 
-        $this->viewData['assetsPath'] = base_url('assets/admin');
+        $this->viewData['assetsPath'] = base_url('assets/back/');
 
         $this->viewData['className'] = str_replace('controller', '', $this->authLib->getClassName());
         $this->viewData['controllerName'] = $this->authLib->getControllerName() ;

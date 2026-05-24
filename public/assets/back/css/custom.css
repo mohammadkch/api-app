@@ -228,6 +228,12 @@ html[dir="rtl"] .page-wrapper.compact-wrapper .page-header.close_icon {
 }
 
 /* select2 */
+/*
 .select2-container {
     width: 100% !important;
+}*/
+
+select,
+select option {
+    font-family: 'IRANSansWeb', 'Tahoma', sans-serif;
 }

@@ -14,8 +14,8 @@
         </div>
         <div class="logo-icon-wrapper">
             <a href="index.html">
-                <img class="img-fluid main-logo main-white" src="<?= base_url() ?>assets/back/images/logo/logo.png" alt="logo">
-                <img class="img-fluid main-logo main-dark" src="<?= base_url() ?>assets/back/images/logo/logo-white.png" alt="logo">
+                <img class="img-fluid main-logo main-white" src="<?= $assetsPath ?>images/logo/logo.png" alt="logo">
+                <img class="img-fluid main-logo main-dark" src="<?= $assetsPath ?>images/logo/logo-white.png" alt="logo">
             </a>
         </div>
         <nav class="sidebar-main">

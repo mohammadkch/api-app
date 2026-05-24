@@ -42,7 +42,7 @@
                                                 </label>
                                                 <div class="col-sm-9">
                                                     <?php
-                                                    $value = set_value($input_key, isset($edit_row[$input_key]) ? $edit_row[$input_key] : '');
+                                                    $value = set_value($input_key, isset($edit_row[$input_key]) ? $edit_row[$input_key] : (($input_key == 'price' && isset($edit_row['current_price'])) ? $edit_row['current_price'] : ''));
 
                                                     if ($input['input'] == 'form_input'):
 //                                                        if ($input['type'] == 'password') $value = '';
@@ -105,9 +105,9 @@
 <?= $this->section('scripts') ?>
     <script>
         $(document).ready(function() {
-            $('.js-role-select, .js-city-select, .js-state-select').select2({
-                width: '100%'
-            });
+            // $('.js-role-select, .js-city-select, .js-state-select').select2({
+            //     width: '100%'
+            // });
 
             $('#avatar').on('change', function(e) {
                 const file = e.target.files[0];
@@ -151,7 +151,7 @@
                 .then(response => response.text())  // ← text، نه json
                 .then(html => {
                     $('#city_id').parent().html(html);
-                    $('#city_id').select2({ width: '100%' });
+                    // $('#city_id').select2({ width: '100%' });
                 })
                 .catch(error => console.error('Error:', error));
         }

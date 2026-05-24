@@ -8,9 +8,9 @@
 
     <!-- استایل‌های اختصاصی این صفحه -->
 <?= $this->section('styles') ?>
-    <link rel="stylesheet" href="<?= base_url() ?>assets/back/css/ratio.css">
-    <link rel="stylesheet" href="<?= base_url() ?>assets/back/css/vector-map.css">
-    <link rel="stylesheet" href="<?= base_url() ?>assets/back/css/vendors/slick.css">
+    <link rel="stylesheet" href="<?= $assetsPath ?>css/ratio.css">
+    <link rel="stylesheet" href="<?= $assetsPath ?>css/vector-map.css">
+    <link rel="stylesheet" href="<?= $assetsPath ?>css/vendors/slick.css">
 <?= $this->endSection() ?>
 
     <!-- محتوای اصلی -->
@@ -111,7 +111,7 @@
                                 <div>
                                     <div class="dashboard-category">
                                         <a href="javascript:void(0)" class="category-image">
-                                            <img src="<?php echo base_url() ?>assets/back/svg/vegetable.svg"
+                                            <img src="<?= $assetsPath ?>svg/vegetable.svg"
                                                  class="img-fluid" alt="">
                                         </a>
                                         <a href="javascript:void(0)" class="category-name">
@@ -123,7 +123,7 @@
                                 <div>
                                     <div class="dashboard-category">
                                         <a href="javascript:void(0)" class="category-image">
-                                            <img src="<?php echo base_url() ?>assets/back/svg/cup.svg" class="img-fluid"
+                                            <img src="<?= $assetsPath ?>svg/cup.svg" class="img-fluid"
                                                  alt="">
                                         </a>
                                         <a href="javascript:void(0)" class="category-name">
@@ -135,7 +135,7 @@
                                 <div>
                                     <div class="dashboard-category">
                                         <a href="javascript:void(0)" class="category-image">
-                                            <img src="<?php echo base_url() ?>assets/back/svg/meats.svg"
+                                            <img src="<?= $assetsPath ?>svg/meats.svg"
                                                  class="img-fluid" alt="">
                                         </a>
                                         <a href="javascript:void(0)" class="category-name">
@@ -147,7 +147,7 @@
                                 <div>
                                     <div class="dashboard-category">
                                         <a href="javascript:void(0)" class="category-image">
-                                            <img src="<?php echo base_url() ?>assets/back/svg/breakfast.svg"
+                                            <img src="<?= $assetsPath ?>svg/breakfast.svg"
                                                  class="img-fluid" alt="">
                                         </a>
                                         <a href="javascript:void(0)" class="category-name">
@@ -159,7 +159,7 @@
                                 <div>
                                     <div class="dashboard-category">
                                         <a href="javascript:void(0)" class="category-image">
-                                            <img src="<?php echo base_url() ?>assets/back/svg/frozen.svg"
+                                            <img src="<?= $assetsPath ?>svg/frozen.svg"
                                                  class="img-fluid" alt="">
                                         </a>
                                         <a href="javascript:void(0)" class="category-name">
@@ -171,7 +171,7 @@
                                 <div>
                                     <div class="dashboard-category">
                                         <a href="javascript:void(0)" class="category-image">
-                                            <img src="<?php echo base_url() ?>assets/back/svg/milk.svg"
+                                            <img src="<?= $assetsPath ?>svg/milk.svg"
                                                  class="img-fluid" alt="">
                                         </a>
                                         <a href="javascript:void(0)" class="category-name">
@@ -183,7 +183,7 @@
                                 <div>
                                     <div class="dashboard-category">
                                         <a href="javascript:void(0)" class="category-image">
-                                            <img src="<?php echo base_url() ?>assets/back/svg/pet.svg" class="img-fluid"
+                                            <img src="<?= $assetsPath ?>svg/pet.svg" class="img-fluid"
                                                  alt="">
                                         </a>
                                         <a href="javascript:void(0)" class="category-name">
@@ -195,7 +195,7 @@
                                 <div>
                                     <div class="dashboard-category">
                                         <a href="javascript:void(0)" class="category-image">
-                                            <img src="<?php echo base_url() ?>assets/back/svg/vegetable.svg"
+                                            <img src="<?= $assetsPath ?>svg/vegetable.svg"
                                                  class="img-fluid" alt="">
                                         </a>
                                         <a href="javascript:void(0)" class="category-name">
@@ -207,7 +207,7 @@
                                 <div>
                                     <div class="dashboard-category">
                                         <a href="javascript:void(0)" class="category-image">
-                                            <img src="<?php echo base_url() ?>assets/back/svg/cup.svg" class="img-fluid"
+                                            <img src="<?= $assetsPath ?>svg/cup.svg" class="img-fluid"
                                                  alt="">
                                         </a>
                                         <a href="javascript:void(0)" class="category-name">
@@ -219,7 +219,7 @@
                                 <div>
                                     <div class="dashboard-category">
                                         <a href="javascript:void(0)" class="category-image">
-                                            <img src="<?php echo base_url() ?>assets/back/svg/meats.svg"
+                                            <img src="<?= $assetsPath ?>svg/meats.svg"
                                                  class="img-fluid" alt="">
                                         </a>
                                         <a href="javascript:void(0)" class="category-name">
@@ -231,7 +231,7 @@
                                 <div>
                                     <div class="dashboard-category">
                                         <a href="javascript:void(0)" class="category-image">
-                                            <img src="<?php echo base_url() ?>assets/back/svg/breakfast.svg"
+                                            <img src="<?= $assetsPath ?>svg/breakfast.svg"
                                                  class="img-fluid" alt="">
                                         </a>
                                         <a href="javascript:void(0)" class="category-name">
@@ -243,7 +243,7 @@
                                 <div>
                                     <div class="dashboard-category">
                                         <a href="javascript:void(0)" class="category-image">
-                                            <img src="<?php echo base_url() ?>assets/back/svg/frozen.svg"
+                                            <img src="<?= $assetsPath ?>svg/frozen.svg"
                                                  class="img-fluid" alt="">
                                         </a>
                                         <a href="javascript:void(0)" class="category-name">
@@ -255,7 +255,7 @@
                                 <div>
                                     <div class="dashboard-category">
                                         <a href="javascript:void(0)" class="category-image">
-                                            <img src="<?php echo base_url() ?>assets/back/svg/milk.svg"
+                                            <img src="<?= $assetsPath ?>svg/milk.svg"
                                                  class="img-fluid" alt="">
                                         </a>
                                         <a href="javascript:void(0)" class="category-name">
@@ -267,7 +267,7 @@
                                 <div>
                                     <div class="dashboard-category">
                                         <a href="javascript:void(0)" class="category-image">
-                                            <img src="<?php echo base_url() ?>assets/back/svg/pet.svg" class="img-fluid"
+                                            <img src="<?= $assetsPath ?>svg/pet.svg" class="img-fluid"
                                                  alt="">
                                         </a>
                                         <a href="javascript:void(0)" class="category-name">
@@ -333,7 +333,7 @@
                                             <td>
                                                 <div class="best-product-box">
                                                     <div class="product-image">
-                                                        <img src="<?php echo base_url() ?>assets/back/images/product/1.png"
+                                                        <img src="<?= $assetsPath ?>images/product/1.png"
                                                              class="img-fluid" alt="Product">
                                                     </div>
                                                     <div class="product-name">
@@ -376,7 +376,7 @@
                                             <td>
                                                 <div class="best-product-box">
                                                     <div class="product-image">
-                                                        <img src="<?php echo base_url() ?>assets/back/images/product/2.png"
+                                                        <img src="<?= $assetsPath ?>images/product/2.png"
                                                              class="img-fluid" alt="Product">
                                                     </div>
                                                     <div class="product-name">
@@ -419,7 +419,7 @@
                                             <td>
                                                 <div class="best-product-box">
                                                     <div class="product-image">
-                                                        <img src="<?php echo base_url() ?>assets/back/images/product/3.png"
+                                                        <img src="<?= $assetsPath ?>images/product/3.png"
                                                              class="img-fluid" alt="Product">
                                                     </div>
                                                     <div class="product-name">
@@ -880,13 +880,13 @@
 
 <?= $this->section('scripts') ?>
     <!-- dashboard scripts -->
-    <script src="<?= base_url() ?>assets/back/js/tooltip-init.js"></script>
-    <script src="<?= base_url() ?>assets/back/js/chart/apex-chart/apex-chart1.js"></script>
-    <script src="<?= base_url() ?>assets/back/js/chart/apex-chart/moment.min.js"></script>
-    <script src="<?= base_url() ?>assets/back/js/chart/apex-chart/apex-chart.js"></script>
-    <script src="<?= base_url() ?>assets/back/js/chart/apex-chart/stock-prices.js"></script>
-    <script src="<?= base_url() ?>assets/back/js/chart/apex-chart/chart-custom1.js"></script>
-    <script src="<?= base_url() ?>assets/back/js/slick.min.js"></script>
-    <script src="<?= base_url() ?>assets/back/js/custom-slick.js"></script>
-    <script src="<?= base_url() ?>assets/back/js/ratio.js"></script>
+    <script src="<?= $assetsPath ?>js/tooltip-init.js"></script>
+    <script src="<?= $assetsPath ?>js/chart/apex-chart/apex-chart1.js"></script>
+    <script src="<?= $assetsPath ?>js/chart/apex-chart/moment.min.js"></script>
+    <script src="<?= $assetsPath ?>js/chart/apex-chart/apex-chart.js"></script>
+    <script src="<?= $assetsPath ?>js/chart/apex-chart/stock-prices.js"></script>
+    <script src="<?= $assetsPath ?>js/chart/apex-chart/chart-custom1.js"></script>
+    <script src="<?= $assetsPath ?>js/slick.min.js"></script>
+    <script src="<?= $assetsPath ?>js/custom-slick.js"></script>
+    <script src="<?= $assetsPath ?>js/ratio.js"></script>
 <?= $this->endSection() ?>
